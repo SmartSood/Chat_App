@@ -18,18 +18,17 @@ model User {
   id            String   @id @default(uuid())
   name          String
   phoneNumber   String   @unique
-  email         String   @unique
-  profileHash   String   @unique
+  password      String //encrypted
   profilePicUrl String?
   about         String?
   isOnline      Boolean  @default(false)
   lastSeen      DateTime @default(now())
-  
+
   statuses     Status[]
   messages     Message[]      @relation("SenderMessages")
   chatUsers    ChatUser[]
   seenMessages SeenMessage[]
-  statusViews  StatusViewer[] // status views
+  statusViews  StatusViewer[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,8 +38,8 @@ model Chat {
   id        String     @id @default(uuid())
   isGroup   Boolean    @default(false)
   groupName String? // null for 1-on-1 chats
-  groupIcon String? // null for 1-on-1 chats
-  createdBy String?// null for 1-on-1 chats
+  groupIcon String? // optional
+  createdBy String?
   messages  Message[]
   users     ChatUser[]
 

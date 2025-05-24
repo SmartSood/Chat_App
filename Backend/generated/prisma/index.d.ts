@@ -1619,6 +1619,7 @@ export namespace Prisma {
     id: string | null
     name: string | null
     phoneNumber: string | null
+    password: string | null
     profilePicUrl: string | null
     about: string | null
     isOnline: boolean | null
@@ -1631,6 +1632,7 @@ export namespace Prisma {
     id: string | null
     name: string | null
     phoneNumber: string | null
+    password: string | null
     profilePicUrl: string | null
     about: string | null
     isOnline: boolean | null
@@ -1643,6 +1645,7 @@ export namespace Prisma {
     id: number
     name: number
     phoneNumber: number
+    password: number
     profilePicUrl: number
     about: number
     isOnline: number
@@ -1657,6 +1660,7 @@ export namespace Prisma {
     id?: true
     name?: true
     phoneNumber?: true
+    password?: true
     profilePicUrl?: true
     about?: true
     isOnline?: true
@@ -1669,6 +1673,7 @@ export namespace Prisma {
     id?: true
     name?: true
     phoneNumber?: true
+    password?: true
     profilePicUrl?: true
     about?: true
     isOnline?: true
@@ -1681,6 +1686,7 @@ export namespace Prisma {
     id?: true
     name?: true
     phoneNumber?: true
+    password?: true
     profilePicUrl?: true
     about?: true
     isOnline?: true
@@ -1766,6 +1772,7 @@ export namespace Prisma {
     id: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl: string | null
     about: string | null
     isOnline: boolean
@@ -1795,6 +1802,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phoneNumber?: boolean
+    password?: boolean
     profilePicUrl?: boolean
     about?: boolean
     isOnline?: boolean
@@ -1813,6 +1821,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phoneNumber?: boolean
+    password?: boolean
     profilePicUrl?: boolean
     about?: boolean
     isOnline?: boolean
@@ -1825,6 +1834,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phoneNumber?: boolean
+    password?: boolean
     profilePicUrl?: boolean
     about?: boolean
     isOnline?: boolean
@@ -1837,6 +1847,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phoneNumber?: boolean
+    password?: boolean
     profilePicUrl?: boolean
     about?: boolean
     isOnline?: boolean
@@ -1845,7 +1856,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phoneNumber" | "profilePicUrl" | "about" | "isOnline" | "lastSeen" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phoneNumber" | "password" | "profilePicUrl" | "about" | "isOnline" | "lastSeen" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     statuses?: boolean | User$statusesArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
@@ -1870,6 +1881,7 @@ export namespace Prisma {
       id: string
       name: string
       phoneNumber: string
+      password: string
       profilePicUrl: string | null
       about: string | null
       isOnline: boolean
@@ -2307,6 +2319,7 @@ export namespace Prisma {
     readonly id: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly phoneNumber: FieldRef<"User", 'String'>
+    readonly password: FieldRef<"User", 'String'>
     readonly profilePicUrl: FieldRef<"User", 'String'>
     readonly about: FieldRef<"User", 'String'>
     readonly isOnline: FieldRef<"User", 'Boolean'>
@@ -9376,6 +9389,7 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     phoneNumber: 'phoneNumber',
+    password: 'password',
     profilePicUrl: 'profilePicUrl',
     about: 'about',
     isOnline: 'isOnline',
@@ -9558,6 +9572,7 @@ export namespace Prisma {
     id?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     phoneNumber?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
     profilePicUrl?: StringNullableFilter<"User"> | string | null
     about?: StringNullableFilter<"User"> | string | null
     isOnline?: BoolFilter<"User"> | boolean
@@ -9575,6 +9590,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phoneNumber?: SortOrder
+    password?: SortOrder
     profilePicUrl?: SortOrderInput | SortOrder
     about?: SortOrderInput | SortOrder
     isOnline?: SortOrder
@@ -9595,6 +9611,7 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
     profilePicUrl?: StringNullableFilter<"User"> | string | null
     about?: StringNullableFilter<"User"> | string | null
     isOnline?: BoolFilter<"User"> | boolean
@@ -9612,6 +9629,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phoneNumber?: SortOrder
+    password?: SortOrder
     profilePicUrl?: SortOrderInput | SortOrder
     about?: SortOrderInput | SortOrder
     isOnline?: SortOrder
@@ -9630,6 +9648,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     phoneNumber?: StringWithAggregatesFilter<"User"> | string
+    password?: StringWithAggregatesFilter<"User"> | string
     profilePicUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
     about?: StringNullableWithAggregatesFilter<"User"> | string | null
     isOnline?: BoolWithAggregatesFilter<"User"> | boolean
@@ -10011,6 +10030,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -10028,6 +10048,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -10045,6 +10066,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -10062,6 +10084,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -10079,6 +10102,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -10091,6 +10115,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -10103,6 +10128,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -10580,6 +10606,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phoneNumber?: SortOrder
+    password?: SortOrder
     profilePicUrl?: SortOrder
     about?: SortOrder
     isOnline?: SortOrder
@@ -10592,6 +10619,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phoneNumber?: SortOrder
+    password?: SortOrder
     profilePicUrl?: SortOrder
     about?: SortOrder
     isOnline?: SortOrder
@@ -10604,6 +10632,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phoneNumber?: SortOrder
+    password?: SortOrder
     profilePicUrl?: SortOrder
     about?: SortOrder
     isOnline?: SortOrder
@@ -11917,6 +11946,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -11933,6 +11963,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -11998,6 +12029,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12014,6 +12046,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12030,6 +12063,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12046,6 +12080,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12127,6 +12162,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12143,6 +12179,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12233,6 +12270,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12249,6 +12287,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12312,6 +12351,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12328,6 +12368,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12344,6 +12385,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12360,6 +12402,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12414,6 +12457,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12430,6 +12474,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12485,6 +12530,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12501,6 +12547,7 @@ export namespace Prisma {
     id?: string
     name: string
     phoneNumber: string
+    password: string
     profilePicUrl?: string | null
     about?: string | null
     isOnline?: boolean
@@ -12562,6 +12609,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
@@ -12578,6 +12626,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     profilePicUrl?: NullableStringFieldUpdateOperationsInput | string | null
     about?: NullableStringFieldUpdateOperationsInput | string | null
     isOnline?: BoolFieldUpdateOperationsInput | boolean
