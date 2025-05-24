@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  phoneNumber   String   @unique
+  profilePicUrl String?
+  about         String?
+  isOnline      Boolean  @default(false)
+  lastSeen      DateTime @default(now())
+
+  statuses      Status[]
+  messages      Message[]        @relation("SenderMessages")
+  chatUsers     ChatUser[]
+  seenMessages  SeenMessage[]
+  statusViews   StatusViewer[]  
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Chat {
+  id         String     @id @default(uuid())
+  isGroup    Boolean    @default(false)
+  groupName  String?    // null for 1-on-1 chats
+  groupIcon  String?    // optional
+  createdBy  String?
+  messages   Message[]
+  users      ChatUser[]
+  
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model ChatUser {
+  id       String   @id @default(uuid())
+  chat     Chat     @relation(fields: [chatId], references: [id])
+  chatId   String
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  role     String   // "admin" or "member"
+
+  joinedAt DateTime @default(now())
+
+  @@unique([chatId, userId]) // No duplicate members
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  content     String?
+  type        MessageType @default(TEXT)
+  mediaUrl    String?   // if it's an image, video, etc.
+  sender      User      @relation("SenderMessages", fields: [senderId], references: [id])
+  senderId    String
+  chat        Chat      @relation(fields: [chatId], references: [id])
+  chatId      String
+  sentAt      DateTime  @default(now())
+  seenBy      SeenMessage[]
+
+  @@index([chatId, sentAt])
+}
+
+model SeenMessage {
+  id        String   @id @default(uuid())
+  message   Message  @relation(fields: [messageId], references: [id])
+  messageId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  seenAt    DateTime @default(now())
+
+  @@unique([messageId, userId]) // each user can mark a message seen once
+}
+
+model Status {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  mediaUrl   String
+  caption    String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  viewers    StatusViewer[]
+}
+
+model StatusViewer {
+  id        String   @id @default(uuid())
+  status    Status   @relation(fields: [statusId], references: [id])
+  statusId  String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  viewedAt  DateTime @default(now())
+
+  @@unique([statusId, userId])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  DOCUMENT
+  AUDIO
+  CONTACT
+  LOCATION
+}
