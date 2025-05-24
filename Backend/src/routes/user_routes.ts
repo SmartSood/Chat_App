@@ -6,7 +6,8 @@ const User_router=Router();
 
 //@ts-ignore
 User_router.get('/me',authmiddleware,async (req:Request,res:Response)=>{
-const {id}=req.body;
+//@ts-ignore
+const id=req.user.id
 const user=await prisma.user.findUnique({
     where:{
         id:id
@@ -25,7 +26,9 @@ res.json({
 )
 //@ts-ignore
 User_router.put('/update',authmiddleware,async (req:Request,res:Response)=>{
-const {id,username,email,phoneNumber,profilePicUrl}=req.body;
+    //@ts-ignore
+const id=req.user.id
+const {username,email,phoneNumber,profilePicUrl}=req.body;
 
 const user=await prisma.user.update({
     where:{

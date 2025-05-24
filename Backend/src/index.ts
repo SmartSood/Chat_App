@@ -4,7 +4,7 @@ import 'dotenv/config'
 import Auth_router from "./routes/auth_routes";
 import { authmiddleware } from "./middleware/authmiddleware";
 import User_router from "./routes/user_routes";
-
+import Chat_router from "./routes/chat_routes";
 const bcrypt=require("bcrypt")
 
 
@@ -18,6 +18,8 @@ app.use("/auth",Auth_router);
 
 
 app.use("/user",User_router)
+
+app.use("/chat",Chat_router)
 
 
 app.listen(3000,()=>{

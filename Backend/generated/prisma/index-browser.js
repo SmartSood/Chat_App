@@ -139,6 +139,7 @@ exports.Prisma.ChatScalarFieldEnum = {
   isGroup: 'isGroup',
   groupName: 'groupName',
   groupIcon: 'groupIcon',
+  groupDescription: 'groupDescription',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

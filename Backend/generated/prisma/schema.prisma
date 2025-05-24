@@ -36,13 +36,14 @@ model User {
 }
 
 model Chat {
-  id        String     @id @default(uuid())
-  isGroup   Boolean    @default(false)
-  groupName String? // null for 1-on-1 chats
-  groupIcon String? // optional
-  createdBy String?
-  messages  Message[]
-  users     ChatUser[]
+  id               String     @id @default(uuid())
+  isGroup          Boolean    @default(false)
+  groupName        String? // null for 1-on-1 chats
+  groupIcon        String? // optional
+  groupDescription String? //null for 1-1 chats
+  createdBy        String? //null for 1-1 chats
+  messages         Message[]
+  chatUsers        ChatUser[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,7 +55,7 @@ model ChatUser {
   chatId String
   user   User   @relation(fields: [userId], references: [id])
   userId String
-  role   String // "admin" or "member"
+  role   String @default("member") // "admin" or "member"
 
   joinedAt DateTime @default(now())
 
