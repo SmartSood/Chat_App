@@ -20,7 +20,7 @@ model User {
   phoneNumber   String   @unique
   email         String   @unique
   password      String //encrypted
-  profilePicUrl String?
+  profilePicUrl String?  @default("default")
   about         String?
   isOnline      Boolean  @default(false)
   lastSeen      DateTime @default(now())
