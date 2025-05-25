@@ -6,14 +6,14 @@ import User_router from "./routes/user_routes";
 import Chat_router from "./routes/chat_routes";
 import status_Router from "./routes/status_routes";
 import message_Router from "./routes/message_routes";
-
-
+import cors from 'cors';
 
 
 
 const app=express();
 
 app.use(express.json());
+app.use(cors())
 
 app.use("/auth",Auth_router);
 

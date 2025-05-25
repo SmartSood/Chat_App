@@ -4,14 +4,16 @@ interface ButtonIconProps {
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
-    size?: "small" | "medium" | "large"; 
+    size?: "small" | "medium" | "large"
+    |"xtralarge"; 
     fill_color?:string
 }
 
 const sizeClasses = {
   small: "w-8 h-8",
   medium: "w-10 h-10",
-  large: "w-12 h-12"
+  large: "w-12 h-12",
+  xtralarge:"w-20 h-20"
 };
 
 

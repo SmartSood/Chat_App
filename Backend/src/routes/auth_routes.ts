@@ -4,6 +4,7 @@ import 'dotenv/config'
 import prisma from "../PrismaClient/PrismaClientGenerate";
 import { Request,Response,NextFunction } from "express";
 import jwt  from "jsonwebtoken";
+import upload from '../middleware/upload';
 // use `prisma` in your application to read and write data in your DB
 const Auth_router=express.Router();
 import bcrypt from "bcrypt";
@@ -21,67 +22,67 @@ const loginScemma=z.object({
 })
 
 //@ts-ignore
-Auth_router.post('/signup',async (req:Request,res:Response)=>{
 
-    // Validating the request body against the schema
 
-    const validation= userSchema.safeParse(req.body);
-    if (!validation.success) {
+Auth_router.post('/signup', upload.single('profilePic'), async (req: Request, res: Response) => {
+    try {
+      console.log('Uploaded file info:', req.file); // ✅ Log uploaded file info
+  
+      const validation = userSchema.safeParse(req.body);
+      if (!validation.success) {
         return res.status(400).json({ error: validation.error.errors });
-    }
-   
-    const {username,password,email,phoneNumber}=validation.data;
-    const SALT_ROUNDS= Number(process.env.SALT_ROUNDS)||10
-
-
-    const hashed_password=await bcrypt.hash(password,SALT_ROUNDS);
-
-
-
-
-
-    // Checking if the user already exists
-    const find_user=await prisma.user.findFirst({
-
-
-        where:{
-                
-                OR:[
-                    {username:username},
-                    {email:email},
-                    {phoneNumber:phoneNumber}
-                ]
+      }
+  
+      const { username, password, email, phoneNumber } = validation.data;
+      const bio = req.body.bio || ''; // ✅ Optional bio from frontend
+      const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
+      const hashed_password = await bcrypt.hash(password, SALT_ROUNDS);
+  
+      // Check if user already exists
+      const find_user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { username: username },
+            { email: email },
+            { phoneNumber: phoneNumber }
+          ]
         }
-    })
-
-    if(find_user?.email==email){
-
-        return res.status(400).json({ error: "Email already exists Please Login!" });
-    }
-    if(find_user?.username==username){
-
-        return res.status(400).json({ error: "Username already exists Try using different one " });
-    }
-    if(find_user?.phoneNumber==phoneNumber){
-
-        return res.status(400).json({ error: "Phone number already exists Please Login!" });
-    }
-    
-    const user=await prisma.user.create({
-        data:{
-            username,
-            password:hashed_password,
-            email,
-            //@ts-ignore
-            phoneNumber
+      });
+  
+      if (find_user) {
+        if (find_user.email === email)
+          return res.status(400).json({ error: "Email already exists. Please login!" });
+        if (find_user.username === username)
+          return res.status(400).json({ error: "Username already exists." });
+        if (find_user.phoneNumber === phoneNumber)
+          return res.status(400).json({ error: "Phone number already exists." });
+      }
+  
+      // ✅ Store Cloudinary URL or fallback to "default"
+      const profilePicUrl = req.file ? (req.file as any).path : 'default';
+  
+      // ✅ Create user in DB
+      const user = await prisma.user.create({
+        data: {
+          username,
+          password: hashed_password,
+          email,
+          phoneNumber,
+          profilePicUrl,
+          about: bio // ✅ Store bio in 'about' column
         }
-    })
-    await prisma.$disconnect();
-    res.json({
-        user:user,
-        mssg:"User Created"
-    })
-})
+      });
+  
+      res.json({
+        user,
+        msg: "User created successfully"
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
 
 //@ts-ignore
 Auth_router.post("/signin",async (req:Request,res:Response)=>{
