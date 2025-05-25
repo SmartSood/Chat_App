@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { Button } from './ui/Button'
+import { Input } from './ui/Input'
+import { ButtonIcon } from './ui/Button_Icon'
+import SignupPage from './pages/Signup'
 import ProfileCart from './ui/Profile_cart'
 import './App.css'
 import Landingpage from './pages/landing_page'
