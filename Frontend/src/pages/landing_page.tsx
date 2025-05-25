@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 const AnonymityApp = () => {
+  const nav = useNavigate();
   const avatars = [
     'avatar1.png',
     'avatar2.png',
@@ -76,7 +77,8 @@ const AnonymityApp = () => {
 
       {/* Action Buttons */}
       <div className="flex flex-col items-center space-y-4 w-full max-w-xs z-10 mb-8">
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium text-lg shadow-md transition-colors">
+        <button onClick={()=>{
+        nav('/signup')}}className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium text-lg shadow-md transition-colors">
           Create an account
         </button>
         <button className="w-full text-blue-600 hover:text-blue-800 font-medium py-3 px-6 rounded-lg transition-colors">

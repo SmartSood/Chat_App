@@ -7,12 +7,27 @@ import DropdownArrowIcon from '../icons/dropdown_arrow';
 import { CameraIcon } from '../icons/camera_icon';
 import { GalleryIcon } from '../icons/gallery_icon';
 import { AvatarIcon } from '../icons/avatar_icon';
-
+import { useNavigate } from 'react-router-dom';
+import AvatarSelect from '../components/avatarselect';
 export default function Signup() {
   const countries = [
     { code: '+44', flag: 'https://flagcdn.com/w40/gb.png', name: 'UK' },
     { code: '+91', flag: 'https://flagcdn.com/w40/in.png', name: 'India' },
     { code: '+1', flag: 'https://flagcdn.com/w40/us.png', name: 'USA' },
+  ];
+
+
+  
+  const avatars = [
+    'avatar1.png',
+    'avatar2.png',
+    'avatar3.png',
+    'avatar4.png',
+    'avatar5.png',
+    'avatar6.png',
+    'avatar7.png',
+    'avatar8.png',
+    'avatar9.png',
   ];
 
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
@@ -26,10 +41,15 @@ export default function Signup() {
   const [profileDrawer, setProfileDrawer] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-
+  const [avatarSelected,setavatarSelected]=useState<Boolean>(false)
+  
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
+
+
+
+
+  const navigate=useNavigate();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -38,6 +58,10 @@ export default function Signup() {
       setProfileImage(imageUrl);
     }
   };
+
+  function handle_back_arrow(){
+    navigate('/')
+  }
   const openCamera = () => {
     cameraInputRef.current?.click();
   };
@@ -45,6 +69,12 @@ export default function Signup() {
   const openGallery = () => {
     galleryInputRef.current?.click();
   };
+
+  function openAvatar(){
+    setProfileDrawer(false);
+    setavatarSelected(true);
+    
+  }
 
   const handleSubmit = async () => {
     if (!name || !bio || !email || !phone || !password || !selectedFile) {
@@ -84,10 +114,13 @@ export default function Signup() {
   
   return (
     <div className="min-h-screen bg-blue-background-1 flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-lg p-6">
+
+{avatarSelected ? <AvatarSelect setavatarSelected={setavatarSelected}
+    setProfileImage={setProfileImage}
+    setSelectedFile={setSelectedFile} ></AvatarSelect> :( <div className="w-full max-w-lg bg-white rounded-3xl shadow-lg p-6">
         {/* Back Arrow */}
         <button className="mb-4">
-          <ButtonIcon icon={<BackArrowIcon size="lg" />} />
+          <ButtonIcon onClick={handle_back_arrow} icon={<BackArrowIcon size="lg" />} />
         </button>
 
         {/* Profile Image & Edit */}
@@ -169,9 +202,9 @@ export default function Signup() {
             {loading ? 'Creating...' : 'Create Account'}
           </button>
         </div>
-      </div>
+      </div>)}
 
-      {/* Profile Image Bottom Drawer */}
+   {/* Profile Image Bottom Drawer */}    
       <div
         className={`fixed bottom-0 w-full sm:w-[35%] transition-transform duration-300 ease-in-out ${
           profileDrawer ? 'translate-y-0' : 'translate-y-full'
@@ -189,7 +222,7 @@ export default function Signup() {
           <ImageButton
             label="Avatar"
             icon={<AvatarIcon size="4xl" />}
-            onClick={() => console.log('Avatar clicked')}
+            onClick={openAvatar}
           />
         </div>
 

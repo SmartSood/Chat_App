@@ -6,8 +6,10 @@ import SignupPage from './pages/Signup'
 import ProfileCart from './ui/Profile_cart'
 import './App.css'
 import Landingpage from './pages/landing_page'
-import Avatar from './pages/avatarselect'
-import Addfriend from './pages/Addfriend'
+import Avatar from './components/avatarselect'
+import AvatarSelect from './components/avatarselect'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Signin from './pages/Signin'import Addfriend from './pages/Addfriend'
 
 
 function App() {
@@ -30,13 +32,16 @@ function App() {
   // ]);
 
   return (
-    <>
-    {/* <SignupPage></SignupPage> */}
-    <Addfriend/>
-    
-  
+   < Router>
+    <Routes>
+      <Route path="/" element={<Landingpage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signin" element={<Signin/>} />
+    </Routes>
+    </Router>
+   
       
-    </>
+    
   ) 
 }
 

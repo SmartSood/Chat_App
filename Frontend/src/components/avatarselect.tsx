@@ -1,6 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+interface AvatarSelectProps {
+  setavatarSelected: (value: boolean) => void;
+  setProfileImage: (value: string) => void;
+  setSelectedFile: (value:File|null)=>void
+}
 
-const AvatarSelect = () => {
+const convertPublicImageToFile = async (imagePath: string, fileName: string): Promise<File> => {
+  const response = await fetch(imagePath); // imagePath like "/avatar1.png"
+  const blob = await response.blob();
+  const file = new File([blob], fileName, { type: blob.type });
+  return file;
+};
+
+//@ts-ignore
+const AvatarSelect: React.FC<AvatarSelectProps> = ({ setavatarSelected, setProfileImage,setSelectedFile }) => {
+
+  const navigate = useNavigate();
   const avatars = [
     'avatar1.png',
     'avatar2.png',
@@ -13,13 +29,13 @@ const AvatarSelect = () => {
     'avatar9.png',
   ];
 
+  
   const [selectedAvatar, setSelectedAvatar] = useState(null);
-
   const handleAvatarClick = (avatar) => {
     setSelectedAvatar(avatar);
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (!selectedAvatar) {
       alert('Please select an avatar first');
       return;
@@ -27,6 +43,10 @@ const AvatarSelect = () => {
     // Proceed with the selected avatar
     console.log('Proceeding with avatar:', selectedAvatar);
     alert(`Proceeding with ${selectedAvatar}`);
+    const file = await convertPublicImageToFile(`/${selectedAvatar}`, selectedAvatar);
+    setSelectedFile(file);
+    setProfileImage(`/${selectedAvatar}`); // update with real path
+    setavatarSelected(false);
     // Here you would typically navigate to the next page
   };
 

@@ -87,18 +87,19 @@ Auth_router.post('/signup', upload.single('profilePic'), async (req: Request, re
 //@ts-ignore
 Auth_router.post("/signin",async (req:Request,res:Response)=>{
     try{
+        console.log("entered")
         const validation= await loginScemma.safeParse(req.body);
         if(!validation){
             return res.status(400).json({mssg:"enter valid email"});
         }
-
+        console.log("entered")
         const {email,password}=req.body;
         const find_user=await prisma.user.findFirst({
             where:{
                 email:email
             }
         })
-
+            console.log("entered")
         if(!find_user){
             return res.status(400).json({error:"User not found"});
         }
