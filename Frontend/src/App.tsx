@@ -3,6 +3,7 @@ import { Button } from './ui/Button'
 import ProfileCart from './ui/Profile_cart'
 import './App.css'
 import Landingpage from './pages/landing_page'
+import Avatar from './pages/avatarselect'
 
 
 function App() {
@@ -43,7 +44,8 @@ function App() {
         ))}
       </div> */}
 
-      <Landingpage/>
+      {/* <Landingpage/> */}
+      {/* <Avatar/> */}
 
 
 
