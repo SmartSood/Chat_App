@@ -48,6 +48,7 @@ export default function Signin() {
       const data = await response.json();
       if (response.ok) {
         alert('User Signed in successfully');
+        console.log(data);
         //@ts-ignore
       localStorage.setItem('userId',data.user.id)
       //@ts-ignore

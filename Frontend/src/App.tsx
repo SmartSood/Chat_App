@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { ButtonIcon } from './ui/Button_Icon'
@@ -11,6 +11,8 @@ import AvatarSelect from './components/avatarselect'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Signin from './pages/Signin'
 import Addfriend from './pages/Addfriend'
+import ProtectedRoute from './routes/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
 
 
 function App() {
@@ -32,15 +34,23 @@ function App() {
   //   }
   // ]);
 
+  
+
   return (
+
+    <AuthProvider>
    < Router>
     <Routes>
       <Route path="/" element={<Landingpage />} />
+
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signin" element={<Signin/>} />
+      <Route element={<ProtectedRoute/>}>
       <Route path="/addfriend" element={<Addfriend />} />
+      </Route>
     </Routes>
     </Router>
+    </AuthProvider>
    
       
     

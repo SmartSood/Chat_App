@@ -102,6 +102,11 @@ export default function Signup() {
       const data = await response.json();
       if (response.ok) {
         alert('User created successfully');
+      console.log(data);
+         //@ts-ignore
+      localStorage.setItem('userId',data.user.id)
+      //@ts-ignore
+        localStorage.setItem('token', data.token);
         navigate('/addfriend')
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));

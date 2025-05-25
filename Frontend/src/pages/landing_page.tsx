@@ -81,7 +81,9 @@ const AnonymityApp = () => {
         nav('/signup')}}className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium text-lg shadow-md transition-colors">
           Create an account
         </button>
-        <button className="w-full text-blue-600 hover:text-blue-800 font-medium py-3 px-6 rounded-lg transition-colors">
+        <button onClick={()=>{
+          nav('/signin')
+        }} className="w-full text-blue-600 hover:text-blue-800 font-medium py-3 px-6 rounded-lg transition-colors">
           Log in
         </button>
       </div>
