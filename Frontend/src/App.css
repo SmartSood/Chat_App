@@ -1,16 +1,13 @@
 @import "tailwindcss";
 
-<<<<<<< HEAD
 
 @theme{
     --color-message-sent:rgba(97,113,137,1);
     --color-message-receive:rgba(255,255,255,1);
 }
-=======
 @theme{
     --color-input-white-1: #F6FBFF;
     --color-input-text-black:##8593A8;
     --color-blue-10:##3656A8;
     
 }
->>>>>>> 1e21fc10c46bec686105238057ab5c1b1c16e1ec
