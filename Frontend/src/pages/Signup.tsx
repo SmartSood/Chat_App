@@ -9,6 +9,7 @@ import { GalleryIcon } from '../icons/gallery_icon';
 import { AvatarIcon } from '../icons/avatar_icon';
 import { useNavigate } from 'react-router-dom';
 import AvatarSelect from '../components/avatarselect';
+
 export default function Signup() {
   const countries = [
     { code: '+44', flag: 'https://flagcdn.com/w40/gb.png', name: 'UK' },
@@ -17,7 +18,7 @@ export default function Signup() {
   ];
 
 
-  
+
   const avatars = [
     'avatar1.png',
     'avatar2.png',
@@ -101,6 +102,7 @@ export default function Signup() {
       const data = await response.json();
       if (response.ok) {
         alert('User created successfully');
+        navigate('/addfriend')
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));
       }

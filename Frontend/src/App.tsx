@@ -9,7 +9,8 @@ import Landingpage from './pages/landing_page'
 import Avatar from './components/avatarselect'
 import AvatarSelect from './components/avatarselect'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Signin from './pages/Signin'import Addfriend from './pages/Addfriend'
+import Signin from './pages/Signin'
+import Addfriend from './pages/Addfriend'
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
       <Route path="/" element={<Landingpage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signin" element={<Signin/>} />
+      <Route path="/addfriend" element={<Addfriend />} />
     </Routes>
     </Router>
    

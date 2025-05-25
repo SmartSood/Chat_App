@@ -52,6 +52,7 @@ export default function Signin() {
       localStorage.setItem('userId',data.user.id)
       //@ts-ignore
         localStorage.setItem('token', data.token);
+        navigate('/addfriend')
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));
       }
