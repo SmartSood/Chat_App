@@ -18,14 +18,14 @@ const variantClasses = {
     base: "bg-gray-700 text-white",
     hover: "hover:bg-gray-600 hover:z-20",
     active: "active:bg-gray-800 active:z-20",
-    selected: "bg-gray-400 shadow-inner",
+    selected: "bg-gray-400 shadow-inner text-white",
     disabled: "bg-gray-400 text-gray-200 cursor-not-allowed"
   },
   secondary: {
     base: "bg-gray-200 text-gray-800",
     hover: "hover:bg-gray-300 hover:z-20",
     active: "active:bg-gray-400 active:z-20",
-    selected: "bg-white shadow-inner text-purple-600",
+    selected: "bg-gray-100 shadow-inner text-white-600",
     disabled: "bg-gray-100 text-gray-400 cursor-not-allowed"
   }
 };

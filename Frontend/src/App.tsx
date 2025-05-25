@@ -7,6 +7,7 @@ import ProfileCart from './ui/Profile_cart'
 import './App.css'
 import Landingpage from './pages/landing_page'
 import Avatar from './pages/avatarselect'
+import Addfriend from './pages/Addfriend'
 
 
 function App() {
@@ -30,7 +31,9 @@ function App() {
 
   return (
     <>
-    <SignupPage></SignupPage>
+    {/* <SignupPage></SignupPage> */}
+    <Addfriend/>
+    
   
       
     </>
