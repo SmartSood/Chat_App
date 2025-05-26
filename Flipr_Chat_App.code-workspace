@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "Flipr_Chat_App",
+			"path": "."
+		},
+		{
+			"path": "Backend"
+		},
+		{
+			"path": "Frontend"
+		}
+	],
+	"settings": {}
+}

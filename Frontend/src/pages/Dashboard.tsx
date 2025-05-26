@@ -53,6 +53,8 @@ const ChatxApp = () => {
   const currentUserId=sessionStorage.getItem('userId')
   const [token,setToken]=useState<String|null>(sessionStorage.getItem('token')||null)
   const [selectedStatusUserId, setSelectedStatusUserId] = useState<string | null>(null);
+  //@ts-ignore
+  const inputRef=useRef();
     const navigate=useNavigate();
   const ws = useRef(null);
   useEffect(() => {
@@ -62,8 +64,39 @@ const ChatxApp = () => {
 
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      if (data.type === 'new_message' && data.message.chatId === selectedChat) {
-        setMessages((prev) => [...prev, data.message]);
+    
+      if (data.type === 'new_message') {
+    
+        setUserChats((prevChats) => {
+
+          return prevChats.map((chat) => {
+            // Check if the chat ID matches the incoming message's chat ID
+           
+
+            if (chat.chat.id === data.message.chatId) {
+              // Prevent duplicate messages
+              const alreadyExists = chat.chat.messages.some(
+                (msg) => msg.id === data.message.id
+              );
+        
+              if (alreadyExists) {
+         
+                return chat};
+              // Add the new message to the chat's messages
+              
+        
+              return {
+                ...chat,
+                chat: {
+                  ...chat.chat,
+                  messages: [...chat.chat.messages, data.message],
+                },
+              };
+            }
+            return chat;
+          });
+        });
+        
       }
     };
 
@@ -79,13 +112,13 @@ const ChatxApp = () => {
       console.error('WebSocket is not open. Ready state:', ws.current?.readyState);
       return;
     }
-  
     ws.current.send(
       JSON.stringify({
-        type: 'send_message',
-        selectedChat,
+        variant: 'send_message',
+        chatId:selectedChat,
         content,
         type: 'TEXT',
+        senderId:currentUserId
       })
     );
   };
@@ -481,25 +514,23 @@ const ChatxApp = () => {
 
           {/* Messages area */}
 <div className='overflow-auto h-full '>
-          {userChats.map((Chats)=>{
-            //@ts-ignore
-            console.log(Chats)
-            if(Chats.chatId===selectedChat){
-       
-              return(
-                
-                            //@ts-ignore
-                Chats.chat.messages.map((message)=>{
-                  
-                     return( 
-                      <div className='p-4 '>                     <Message variant={(message.senderId===currentUserId)?"sent":"received"} type='text' text={message.content} time={formatTime(message.sentAt)}></Message></div>
-                     
-)
+{userChats.map((Chats) => {
+  if (Chats.chatId === selectedChat) {
+    const sortedMessages = [...Chats.chat.messages].sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
 
-                })
-              )
-            }
-          })}
+    return sortedMessages.map((message) => (
+      <div key={message.id} className='p-4'>
+        <Message
+          variant={message.senderId === currentUserId ? "sent" : "received"}
+          type='text'
+          text={message.content}
+          time={formatTime(message.sentAt)}
+        />
+      </div>
+    ));
+  }
+})}
+
           </div>
 
           {/* Message input */}
@@ -512,6 +543,7 @@ const ChatxApp = () => {
             />
             <input
               type="text"
+              ref={inputRef}
               placeholder="Type a message"
               className="flex-1 border rounded-full px-4 py-2  focus:outline-none"
             />
@@ -519,7 +551,8 @@ const ChatxApp = () => {
               icon={<FiMessageSquare className="text-gray-600" />}
               size="small"
               className="ml-2"
-              onClick={() => sendMessage('Hello!')}/>
+              //@ts-ignore
+              onClick={() => sendMessage(inputRef.current.value)}/>
             <ButtonIcon 
               icon={<FiMic className="text-gray-600" />}
               size="small"

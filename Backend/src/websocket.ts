@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
+const JWT_SECRET = process.env.JWT_SECRET_KEY || 'key';
 
 // Map to keep track of connected clients by userId
 const clients = new Map<string, Set<WebSocket>>();
@@ -13,7 +13,9 @@ const clients = new Map<string, Set<WebSocket>>();
 function authenticateClient(token: string): { userId: string } | null {
   try {
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const decoded = jwt.verify(token, JWT_SECRET );
+    console.log(decoded)
+    //@ts-ignore
     return decoded;
   } catch {
     return null;
@@ -23,26 +25,25 @@ function authenticateClient(token: string): { userId: string } | null {
 const wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', (ws, req) => {
-  console.log('New WebSocket connection established');
-  console.log(JWT_SECRET)
+ 
   // Extract token from query string
-  const params = new URLSearchParams(req.url);
-  let token = params.get('token');
-  if (!token) {
-    const authHeader = params.get('authorization') || '';
-    if (authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1];
-    }
-  }
-  console.log(token)
+  const params = new URLSearchParams(req.url?.split('?')[1]);
+
+ const token=params.get('token')
+ console.log(token);
+ //@ts-ignore
   const auth = token ? authenticateClient(token) : null;
   if (!auth) {
     ws.send(JSON.stringify({ type: 'error', message: 'Unauthorized' }));
+    ws.send(JSON.stringify({
+      token
+    }))
     ws.close();
     return;
   }
-
-  const userId = auth.userId;
+//@ts-ignore
+  const userId = auth.id;
+  console.log(userId)
 
   // Add connection to the user's set
   if (!clients.has(userId)) clients.set(userId, new Set());
@@ -54,7 +55,7 @@ wss.on('connection', (ws, req) => {
     try {
       const message = JSON.parse(data.toString());
 
-      switch (message.type) {
+      switch (message.variant) {
         case 'send_message': {
           const { chatId, content, type, mediaUrl } = message;
 
@@ -71,7 +72,7 @@ wss.on('connection', (ws, req) => {
               chatId,
               content,
               type,
-              mediaUrl: mediaUrl || null,
+              mediaUrl: mediaUrl || "",
               senderId: userId,
             },
             include: {
