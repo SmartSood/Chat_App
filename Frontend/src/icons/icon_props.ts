@@ -1,5 +1,6 @@
 export interface IconProps {
     size: 'xs' | 'sm' | 'md' | 'lg' | '2xl'|'3xl'|'4xl'|'5xl'|'6xl'|'7xl'|'8xl'|'9xl'|'10xl';
+    fillColor?:String;
   }
   
   export  const iconSizeVariants = {
@@ -19,3 +20,5 @@ export interface IconProps {
     "10xl":"size-44",
 
   }
+
+

@@ -13,7 +13,7 @@ const sizeClasses = {
   small: "w-8 h-8",
   medium: "w-10 h-10",
   large: "w-12 h-12",
-  xtralarge:"w-20 h-20"
+  xtralarge:"w-40 h-40"
 };
 
 

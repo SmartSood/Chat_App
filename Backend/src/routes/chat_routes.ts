@@ -46,74 +46,67 @@ Chat_router.get('/my-chats', async (req: Request, res: Response) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-
-Chat_router.post("/create_individual_chat",async (req: Request,res: Response)=>{
+//@ts-ignore
+  Chat_router.post("/create_individual_chat", async (req: Request, res: Response) => {
     //@ts-ignore
-    const userId=req.user.id
-    const {recieverId}=req.body;
-    if (!userId || !recieverId) {
-        res.status(400).json({ error: "User ID and Reciever ID are required" });
-        return;
+    const userId = req.user.id;
+    const { receiverUsername } = req.body;
+  
+    if (!userId || !receiverUsername) {
+      return res.status(400).json({ error: "Receiver username is required" });
     }
-
-    try{
-        const existingChat = await prisma.chat.findFirst({
-            where: {
-              isGroup: false,
-              AND: [
-                {
-                  chatUsers: {
-                    some: { userId: userId }
-                  }
-                },
-                {
-                  chatUsers: {
-                    some: { userId: recieverId }
-                  }
-                }
-              ]
-            },
-            include: {
-              chatUsers: {
-                include: {
-                  user: true
-                }
-              },
-              messages: true,
-            },
-          });
-
-        if (existingChat) {
-res.json(existingChat);
-return;
-        }
-        const newChat = await prisma.chat.create({
-            data: {
-                isGroup: false,
-                chatUsers: {
-                    create: [
-                        { userId: userId },
-                        { userId: recieverId }
-                    ]
-                }
-            },
-            include: {
-                chatUsers: {
-                    include: {
-                        user: true
-                    }
-                },
-                messages: true,
-            }
-        });
-
-        res.status(201).json(newChat);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error creating chat', error });
+  
+    try {
+      const receiverUser = await prisma.user.findUnique({
+        where: { username: receiverUsername },
+      });
+  
+      if (!receiverUser) {
+        return res.status(404).json({ error: "User not found" });
       }
-   
-})
+  
+      const receiverId = receiverUser.id;
+  
+      const existingChat = await prisma.chat.findFirst({
+        where: {
+          isGroup: false,
+          AND: [
+            { chatUsers: { some: { userId: userId } } },
+            { chatUsers: { some: { userId: receiverId } } },
+          ],
+        },
+        include: {
+          chatUsers: { include: { user: true } },
+          messages: true,
+        },
+      });
+  
+      if (existingChat) {
+        return res.json(existingChat);
+      }
+  
+      const newChat = await prisma.chat.create({
+        data: {
+          isGroup: false,
+          chatUsers: {
+            create: [
+              { userId: userId },
+              { userId: receiverId },
+            ],
+          },
+        },
+        include: {
+          chatUsers: { include: { user: true } },
+          messages: true,
+        },
+      });
+  
+      res.status(201).json(newChat);
+    } catch (error) {
+      console.error("Error creating chat:", error);
+      res.status(500).json({ message: "Error creating chat", error });
+    }
+  });
 
 
 Chat_router.post("/create_group_chat",async (req: Request,res: Response)=>{

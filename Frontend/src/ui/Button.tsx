@@ -9,20 +9,20 @@ interface ButtonProps {
   selected?: boolean;
   disabled?: boolean;
   className?: string;
-  position?: "first" | "middle" | "last" | "single";
+  position?: "first" | "middle" | "last" | "single"|"flat";
     children?: ReactElement;
 }
 
 const variantClasses = {
   primary: {
-    base: "bg-gray-700 text-white",
+    base: "bg-gray-button-2 text-white",
     hover: "hover:bg-gray-600 hover:z-20",
     active: "active:bg-gray-800 active:z-20",
     selected: "bg-gray-400 shadow-inner text-white",
     disabled: "bg-gray-400 text-gray-200 cursor-not-allowed"
   },
   secondary: {
-    base: "bg-gray-200 text-gray-800",
+    base: "bg-gray-button-1 text-gray-800",
     hover: "hover:bg-gray-300 hover:z-20",
     active: "active:bg-gray-400 active:z-20",
     selected: "bg-gray-100 shadow-inner text-white-600",
@@ -49,7 +49,8 @@ export function Button({
   first: "rounded-full border-r-0 -mr-px",       // Fully rounded + remove right border
   middle: "rounded-full border-l-0 border-r-0 -mx-px", // Fully rounded + remove side borders
   last: "rounded-full border-l-0 -ml-px",        // Fully rounded + remove left border
-  single: "rounded-full"                         // Standalone
+  single: "rounded-full"  ,
+  flat:""                       // Standalone
 };
 
   return (
@@ -64,8 +65,8 @@ export function Button({
         ${isDisabled && variantClass.disabled}
         ${positionClasses[position]}
         px-8 py-3 font-medium flex items-center justify-center
-        transition-all duration-200
-        border border-gray-300
+        transition-all overflow-hidden duration-200
+        
         ${selected ? "z-10" : "z-0"}
         ${className}
       `}

@@ -107,7 +107,7 @@ export default function Signup() {
       localStorage.setItem('userId',data.user.id)
       //@ts-ignore
         localStorage.setItem('token', data.token);
-        navigate('/addfriend')
+        navigate('/signin')
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));
       }

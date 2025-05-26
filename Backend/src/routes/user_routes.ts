@@ -25,6 +25,28 @@ res.json({
 }
 )
 //@ts-ignore
+User_router.get('/all',authmiddleware,async(req:Request,res:Response)=>{
+    const users=await prisma.user.findMany({
+        select:{
+            id:true,
+            username:true,
+            email:true,
+            phoneNumber:true,
+            profilePicUrl:true,
+            createdAt:true,
+            updatedAt:true
+        }
+    })
+
+    if(!users){
+        return res.status(404).json({error:"No users found"});
+    }
+
+    res.json({
+        users:users
+    })
+})
+//@ts-ignore
 User_router.put('/update',authmiddleware,async (req:Request,res:Response)=>{
     //@ts-ignore
 const id=req.user.id

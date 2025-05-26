@@ -8,9 +8,11 @@
 @theme{
     --color-input-white-1: #F6FBFF;
     --color-input-text-black:##8593A8;
-    --color-blue-10:##3656A8;
+    --color-blue-10:#3656A8;
     --color-blue-dark-10:#1565C0;
     --color-blue-background-1:#E2EDF5;
-    
+    --color-gray-button-1:#DBE2EC;
+    --color-gray-button-2:#213241;
+    --color-gray-back-arrow-bg-1:#FFFFFF1A
     
 }
