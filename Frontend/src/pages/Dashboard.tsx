@@ -12,6 +12,7 @@ import { GroupIcon } from '../icons/group_icon';
 import { UserAdd } from '../components/userAdd';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import StatusView from '../components/status';
 const ChatxApp = () => {
   // State management
   const [activeTab, setActiveTab] = useState<'messages' | 'social'>('messages');
@@ -127,7 +128,6 @@ const ChatxApp = () => {
   const handleNavClick = (navItem: 'chats' | 'status' | 'groups' | 'calls') => {
     setActiveNav(navItem);
     setSelectedChat(null);
-    navigate(`/${navItem}`)
   };
   const handleChatSelect = (chatId: number) => setSelectedChat(chatId);
 
@@ -200,7 +200,7 @@ const ChatxApp = () => {
         </div>)}  
         
       {/* Left sidebar */}
-     {(!selectUserOpen&&!selectGroupOpen)?(
+     {((activeNav==='status')?(<StatusView statuses={status} authToken={localStorage.getItem('token')} currentUserId={localStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
      <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-blue-background-1 sm:bg-white">
         {/* Header */}
         <header className="flex justify-between items-center p-3  border-gray-300">
@@ -336,7 +336,7 @@ const ChatxApp = () => {
         </nav>)}  
 
        
-      </div>):(selectUserOpen)?(<UserAdd setSelectUserOpen={setSelectUserOpen}></UserAdd>):(<div></div>)} 
+      </div>):(selectUserOpen)?(<UserAdd setSelectUserOpen={setSelectUserOpen}></UserAdd>):(<div></div>))} 
      
      
      
