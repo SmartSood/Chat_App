@@ -94,7 +94,7 @@ export default function Signup() {
       formData.append('password', password);
       formData.append('profilePic', selectedFile); // assuming `selectedFile` holds the image
   
-      const response = await fetch('http://localhost:3000/auth/signup', {
+      const response = await fetch('https://chat-app-unc7.onrender.com/auth/signup', {
         method: 'POST',
         body: formData,
       });

@@ -86,7 +86,7 @@ export const StatusView = ({
   const markStatusAsViewed = async (statusId: string) => {
     try {
       await axios.post(
-        `http://localhost:3000/status/view/${statusId}`,
+        `https://chat-app-unc7.onrender.com/status/view/${statusId}`,
         {},
         {
           headers: {

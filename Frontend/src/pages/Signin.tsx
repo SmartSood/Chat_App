@@ -36,7 +36,7 @@ export default function Signin() {
         const payload = { email, password };
         
   
-      const response = await fetch('http://localhost:3000/auth/signin', {
+      const response = await fetch('https://chat-app-unc7.onrender.com/auth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

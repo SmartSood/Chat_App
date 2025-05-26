@@ -63,7 +63,7 @@ const ChatxApp = () => {
     const navigate=useNavigate();
   const ws = useRef(null);
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:8080/?token=${sessionStorage.getItem('token')}`);
+    ws.current = new WebSocket(`https://chat-app-1-qdhi.onrender.com?token=${sessionStorage.getItem('token')}`);
 
     ws.current.onopen = () => console.log('WS connected');
 
@@ -160,7 +160,7 @@ const ChatxApp = () => {
 //getting my details
   useEffect(()=>{
     async function ggetdetails(){
-      const response =await axios.get('http://localhost:3000/user/me',{
+      const response =await axios.get('https://chat-app-unc7.onrender.com/user/me',{
     
       headers: {
         'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ const ChatxApp = () => {
   useEffect(()=>{
     async function fetch(){
       try{
-        const response=await axios.get('http://localhost:3000/chat/my-chats',
+        const response=await axios.get('https://chat-app-unc7.onrender.com/chat/my-chats',
         {
     
           headers: {
@@ -199,7 +199,7 @@ const ChatxApp = () => {
             const uniqueUserIds = [...new Set(allUserIds)];
             // 2. Fetch statuses for each unique user
         const statusPromises = uniqueUserIds.map(async (userId) =>{
-          return await axios.get(`http://localhost:3000/status/user/${userId}`, {
+          return await axios.get(`https://chat-app-unc7.onrender.com/status/user/${userId}`, {
     
           headers: {
             'Content-Type': 'application/json',

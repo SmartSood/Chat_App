@@ -50,7 +50,7 @@ useEffect(() => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/user/me', {
+      const response = await fetch('https://chat-app-unc7.onrender.com/user/me', {
     headers: {
         'Authorization': `${token}`,
     },
@@ -151,7 +151,7 @@ useEffect(() => {
 
   try {
     const token = sessionStorage.getItem('token');
-    const response = await fetch('http://localhost:3000/user/update', {
+    const response = await fetch('https://chat-app-unc7.onrender.com/user/update', {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json', // Required for JSON payload

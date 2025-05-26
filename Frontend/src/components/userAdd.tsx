@@ -8,7 +8,7 @@ export function UserAdd({setSelectUserOpen,selectUserOpen}:any){
     //fetching user details
     const fetchData = async () => {
         try {
-          const response = await axios.get('http://localhost:3000/user/all', {
+          const response = await axios.get('https://chat-app-unc7.onrender.com/user/all', {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `${sessionStorage.getItem('token')}`,
@@ -50,7 +50,7 @@ const Submit = async () => {
   setLoading(true)
   try {
     const response = await axios.post(
-      "http://localhost:3000/chat/create_individual_chat",
+      "https://chat-app-unc7.onrender.com/chat/create_individual_chat",
       {
         receiverUsername: username
       },

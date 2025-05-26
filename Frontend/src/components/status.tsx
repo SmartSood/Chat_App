@@ -37,7 +37,7 @@ const StatusView = ({ statuses, onClose, authToken, currentUserId }: StatusViewP
 
     // Mark status as viewed when it's displayed if not already viewed
     if (!currentStatus.viewed && currentStatus.user.id !== currentUserId) {
-      fetch(`http://localhost:3000/statuses/view/${currentStatus.id}`, {
+      fetch(`https://chat-app-unc7.onrender.com/statuses/view/${currentStatus.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
