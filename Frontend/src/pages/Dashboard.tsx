@@ -246,7 +246,21 @@ const ChatxApp = () => {
         </div>
 
         </div>
-        
+         {/*  add chat open */}
+         {addChatOpen&&(<div className="w-80 p-4 bg-gray-button-2 fixed sm:left-50 left-40 bottom-40 sm:bottom-20 rounded-xl shadow-[0px_0px_100px_0px_rgba(0,0,0,0.20)] inline-flex flex-col  items-center gap-4">
+  <div onClick={()=>{setSelectUserOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
+    <div className="w-6 h-6 relative overflow-hidden">
+      <div className="w-4 h-5 " > <AvatarIcon size="lg"></AvatarIcon></div>
+    </div>
+    <div className="text-center justify-start text-white text-lg font-medium ">Add Friend</div>
+  </div>
+  <div onClick={()=>{setSelectGroupOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
+    <div className="w-6 h-6 relative overflow-hidden">
+    <div className="w-4 h-5 " > <GroupIcon size="lg"></GroupIcon></div>
+    </div>
+    <div className="text-center justify-start text-white text-lg font-medium ">Create Group</div>
+  </div>
+</div>)}     
         {/* Chats list */}
     {userChats.length>0?(<div className="flex-1 overflow-y-auto">
        {/*  fixed add chat button */}
@@ -262,21 +276,7 @@ const ChatxApp = () => {
           />
         </div>
 
-             {/*  add chat open */}
-        {addChatOpen&&(<div className="w-80 p-4 bg-gray-button-2 fixed sm:left-50 left-40 bottom-40 sm:bottom-20 rounded-xl shadow-[0px_0px_100px_0px_rgba(0,0,0,0.20)] inline-flex flex-col  items-center gap-4">
-  <div onClick={()=>{setSelectUserOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
-    <div className="w-6 h-6 relative overflow-hidden">
-      <div className="w-4 h-5 " > <AvatarIcon size="lg"></AvatarIcon></div>
-    </div>
-    <div className="text-center justify-start text-white text-lg font-medium ">Add Friend</div>
-  </div>
-  <div onClick={()=>{setSelectGroupOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
-    <div className="w-6 h-6 relative overflow-hidden">
-    <div className="w-4 h-5 " > <GroupIcon size="lg"></GroupIcon></div>
-    </div>
-    <div className="text-center justify-start text-white text-lg font-medium ">Create Group</div>
-  </div>
-</div>)}       
+              
 
 
 {userChats.map(({ chat }) => {
@@ -312,8 +312,10 @@ const ChatxApp = () => {
 })}
 
 
-        </div>):(<div className='flex w-full h-full justify-center items-center'>
-          <ButtonIcon fill_color='bg-black' size='xtralarge' className='p-3 ' icon={<AddChatIcon size='5xl'></AddChatIcon>}></ButtonIcon>
+        </div>):(<div onClick={()=>{
+             setAddChatOpen((op)=>!op);
+          }} className='flex w-full h-full justify-center items-center'>
+          <ButtonIcon  fill_color='bg-black' size='xtralarge' className='p-3 ' icon={<AddChatIcon size='5xl'></AddChatIcon>}></ButtonIcon>
           
         </div>)}    
 
