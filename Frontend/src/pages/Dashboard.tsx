@@ -14,6 +14,8 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import StatusView from '../components/status';
 import { Message } from '../ui/Message_Box';
+import SelectFileButton from '../components/SelectFileButton';
+
 function formatTime(isoString) {
   const date = new Date(isoString);
   
@@ -39,7 +41,7 @@ const ChatxApp = () => {
   const [activeTab, setActiveTab] = useState<'messages' | 'social'>('messages');
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeNav, setActiveNav] = useState<'chats' | 'status' | 'groups' | 'calls'>('chats');
+  const [activeNav, setActiveNav] = useState<'chats' | 'status' | 'groups' | 'calls'|'settings'|'logout'>('chats');
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const isSmallScreen = useIsSmallScreen();
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -53,6 +55,9 @@ const ChatxApp = () => {
   const currentUserId=sessionStorage.getItem('userId')
   const [token,setToken]=useState<String|null>(sessionStorage.getItem('token')||null)
   const [selectedStatusUserId, setSelectedStatusUserId] = useState<string | null>(null);
+  const [myDetails,setMyDetails]=useState<Object>({}) 
+  const [file,setFile]=useState<File|null>(null)
+  const [fileSelected,setFileSelected]=useState<Boolean>(false) 
   //@ts-ignore
   const inputRef=useRef();
     const navigate=useNavigate();
@@ -107,12 +112,14 @@ const ChatxApp = () => {
     };
   }, [selectedChat, token]);
 
-  const sendMessage = (content) => {
+  const sendMessage =async  (content) => {
+
+    if(!fileSelected){
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
       console.error('WebSocket is not open. Ready state:', ws.current?.readyState);
       return;
     }
-    ws.current.send(
+   await ws.current.send(
       JSON.stringify({
         variant: 'send_message',
         chatId:selectedChat,
@@ -121,7 +128,56 @@ const ChatxApp = () => {
         senderId:currentUserId
       })
     );
+    }
+    else{
+      if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+        console.error('WebSocket is not open. Ready state:', ws.current?.readyState);
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('chatId', selectedChat);
+      formData.append('type', 'IMAGE');
+      formData.append('senderId', currentUserId)
+      formData.append('content', content) 
+
+      await ws.current.send(
+        JSON.stringify({
+          variant: 'send_message',
+          chatId:selectedChat,
+          content: content,
+          type: 'IMAGE',
+          senderId:currentUserId,
+          mediaUrl: URL.createObjectURL(file)
+        })
+
+      );
+      setFileSelected(false);
+      setFile(null);
+
+    }
   };
+//getting my details
+  useEffect(()=>{
+    async function ggetdetails(){
+      const response =await axios.get('http://localhost:3000/user/me',{
+    
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${sessionStorage.getItem('token')}`
+      }
+    });
+
+    if(response.status==200){
+      setMyDetails(response.data.user);
+      console.log('My details:', response.data.user);
+      setProfileImage(response.data.user.profilePicUrl === 'default' ? '/avatar1.png' : response.data.user.profilePicUrl);
+    }
+    }
+    ggetdetails();
+      
+
+  },[])
   //load user chats and triger rerender whenver the window 
   useEffect(()=>{
     async function fetch(){
@@ -177,23 +233,15 @@ const ChatxApp = () => {
   },[])
 
 
-    //sample chat data
-  // const chats = [
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
+    //for handling logout
 
-  // ];
-
+  useEffect(()=>{
+    if(activeNav==='logout'){
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('userId');
+      navigate('/signin');
+    }
+  },[activeNav])
 
 
   // Navigation items
@@ -215,11 +263,20 @@ const ChatxApp = () => {
 
   // Handler functions
   const handleSearchClick = () => setShowSearch(!showSearch);
-  const handleNavClick = (navItem: 'chats' | 'status' | 'groups' | 'calls') => {
+  const handleNavClick = (navItem: 'chats' | 'status' | 'groups' | 'calls'|'settings'|'logout') => {
     setActiveNav(navItem);
     setSelectedChat(null);
   };
   const handleChatSelect = (chatId: number) => setSelectedChat(chatId);
+  const handleFileSelect = (file) => {
+    console.log("Selected file:", file);
+    
+    setFile(file);
+    setFileSelected(true);
+    // You can handle the file upload here
+    
+    // Upload file or send it via socket
+  };
 
   return (
     <div className="flex h-screen bg-gray-button-1">
@@ -234,12 +291,15 @@ const ChatxApp = () => {
         <div className="flex items-center justify-center mb-4">
           <LogoIcon size="2xl" />
         </div>
-        <div className="relative w-14 h-14 mx-auto mb-8">
+        <div onClick={()=>{
+          navigate('/profile');
+        }} className="relative w-14 h-14 mx-auto mb-8 ">
           {profileImage ? (
             <img
               src={profileImage}
               alt="Profile"
               className="w-14 h-14 rounded-full object-cover"
+
             />
           ) : (
             <div className="w-14 h-14 bg-gray-300 rounded-full" />
@@ -294,7 +354,7 @@ const ChatxApp = () => {
   selectedStatusUserId ? (
     <StatusView
       statuses={status.filter(s => s.user.id === selectedStatusUserId)}
-      authToken={localStorage.getItem('token') || ''}
+      authToken={sessionStorage.getItem('token') || ''}
       currentUserId={currentUserId || ''}
       onClose={() => setSelectedStatusUserId(null)} // Return to list
     />
@@ -522,7 +582,7 @@ const ChatxApp = () => {
       <div key={message.id} className='p-4'>
         <Message
           variant={message.senderId === currentUserId ? "sent" : "received"}
-          type='text'
+          type={message.type}
           text={message.content}
           time={formatTime(message.sentAt)}
         />
@@ -535,12 +595,7 @@ const ChatxApp = () => {
 
           {/* Message input */}
           <div className="flex items-center  bottom-4 p-3 border-t border-gray-300 bg-white">
-            <ButtonIcon 
-              icon={<FiPaperclip className="text-gray-600" />}
-              size="small"
-              fill_color="bg-transparent"
-              className="mr-2"
-            />
+            <SelectFileButton onFileSelect={handleFileSelect}></SelectFileButton>
             <input
               type="text"
               ref={inputRef}

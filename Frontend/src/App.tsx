@@ -13,6 +13,7 @@ import Signin from './pages/Signin'
 import Addfriend from './pages/Dashboard'
 import ProtectedRoute from './routes/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import ProfilePage from './pages/user_info'
 
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
       <Route path="/signin" element={<Signin/>} />
       {/* <Route element={<ProtectedRoute/>}> */}
       <Route path="/addfriend" element={<Addfriend />} />
-      
+      <Route path="/profile" element={<ProfilePage />} />
       
       {/* </Route> */}
     </Routes>

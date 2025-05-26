@@ -2,6 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import jwt from 'jsonwebtoken';
 import prisma from './PrismaClient/PrismaClientGenerate'; // Adjust path to your generated Prisma client
 import dotenv from 'dotenv';
+import streamifier from 'streamifier';
+import { cloudinary } from './utils/cloudinary'; // Adjust path to your Cloudinary utility
 
 dotenv.config();
 
@@ -58,21 +60,51 @@ wss.on('connection', (ws, req) => {
       switch (message.variant) {
         case 'send_message': {
           const { chatId, content, type, mediaUrl } = message;
-
-          // Validate messageType to be one of your enum strings
+  
+          // Validate message type
           const validTypes = ['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT', 'AUDIO', 'CONTACT', 'LOCATION'];
           if (!validTypes.includes(type)) {
             ws.send(JSON.stringify({ type: 'error', message: 'Invalid message type' }));
             return;
           }
-
+  
+          let uploadedUrl = '';
+  
+          if (type !== 'TEXT' && mediaUrl) {
+            // Upload media to Cloudinary
+            const uploadToCloudinary = (): Promise<string> => {
+              return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                  {
+                    folder: 'chat-media',
+                    resource_type: 'auto',
+                  },
+                  (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result?.secure_url || '');
+                  }
+                );
+  
+                streamifier.createReadStream(Buffer.from(mediaUrl, 'base64')).pipe(stream);
+              });
+            };
+  
+            try {
+              uploadedUrl = await uploadToCloudinary();
+            } catch (uploadErr) {
+              console.error('Media upload failed:', uploadErr);
+              ws.send(JSON.stringify({ type: 'error', message: 'Media upload failed' }));
+              return;
+            }
+          }
+  
           // Save message in DB
           const newMessage = await prisma.message.create({
             data: {
               chatId,
               content,
               type,
-              mediaUrl: mediaUrl || "",
+              mediaUrl: uploadedUrl || '',
               senderId: userId,
             },
             include: {
@@ -85,13 +117,13 @@ wss.on('connection', (ws, req) => {
               },
             },
           });
-
-          // Find all chat participants
+  
+          // Notify all participants
           const chat = await prisma.chat.findUnique({
             where: { id: chatId },
             include: { chatUsers: { select: { userId: true } } },
           });
-
+  
           if (chat) {
             chat.chatUsers.forEach(({ userId: participantId }) => {
               const conns = clients.get(participantId);
@@ -102,9 +134,58 @@ wss.on('connection', (ws, req) => {
               }
             });
           }
-
+  
           break;
         }
+        //{
+        //   const { chatId, content, type, mediaUrl } = message;
+
+        //   // Validate messageType to be one of your enum strings
+        //   const validTypes = ['TEXT', 'IMAGE', 'VIDEO', 'DOCUMENT', 'AUDIO', 'CONTACT', 'LOCATION'];
+        //   if (!validTypes.includes(type)) {
+        //     ws.send(JSON.stringify({ type: 'error', message: 'Invalid message type' }));
+        //     return;
+        //   }
+
+        //   // Save message in DB
+        //   const newMessage = await prisma.message.create({
+        //     data: {
+        //       chatId,
+        //       content,
+        //       type,
+        //       mediaUrl: mediaUrl || "",
+        //       senderId: userId,
+        //     },
+        //     include: {
+        //       sender: {
+        //         select: {
+        //           id: true,
+        //           username: true,
+        //           profilePicUrl: true,
+        //         },
+        //       },
+        //     },
+        //   });
+
+        //   // Find all chat participants
+        //   const chat = await prisma.chat.findUnique({
+        //     where: { id: chatId },
+        //     include: { chatUsers: { select: { userId: true } } },
+        //   });
+
+        //   if (chat) {
+        //     chat.chatUsers.forEach(({ userId: participantId }) => {
+        //       const conns = clients.get(participantId);
+        //       if (conns) {
+        //         conns.forEach((clientWs) => {
+        //           clientWs.send(JSON.stringify({ type: 'new_message', message: newMessage }));
+        //         });
+        //       }
+        //     });
+        //   }
+
+        //   break;
+        // }
 
         case 'mark_seen': {
           const { messageId } = message;

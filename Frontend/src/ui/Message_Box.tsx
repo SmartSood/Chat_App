@@ -11,7 +11,7 @@ import {
 
 type MessageStatus = "sending" | "sent" | "delivered" | "read";
 type MessageVariant = "sent" | "received";
-type MessageType = "text" | "voice" | "file" | "image" | "video";
+type MessageType = "TEXT" | "AUDIO" | "FILE" | "IMAGE" | "VIDEO";
 
 interface StatusClasses {
   sending: string;
@@ -150,7 +150,7 @@ export function Message({
   const progressRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>();
   const variantClass = variantClasses[variant];
-  const isMedia = type === "image" || type === "video";
+  const isMedia = type === "IMAGE" || type === "VIDEO";
   const aspectRatio = mediaWidth && mediaHeight ? `${(mediaHeight / mediaWidth) * 100}%` : "56.25%";
 
   const handlePlayPause = () => {
@@ -215,7 +215,7 @@ export function Message({
           <div className="font-semibold text-sm mb-1">{sender}</div>
         )}
 
-        {type === "text" && (
+        {type === "TEXT" && (
           <>
             <div>{text}</div>
             <div className={`flex items-center justify-end gap-1 mt-1 text-xs ${variantClass.time}`}>
@@ -229,7 +229,7 @@ export function Message({
           </>
         )}
 
-        {type === "voice" && (
+        {type === "AUDIO" && (
           <div className="flex items-center gap-3">
             <button 
               onClick={handlePlayPause}
@@ -259,7 +259,7 @@ export function Message({
           </div>
         )}
 
-        {type === "file" && (
+        {type === "FILE" && (
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-lg ${variantClass.secondary}`}>
@@ -288,7 +288,7 @@ export function Message({
           </div>
         )}
 
-        {type === "image" && (
+        {type === "IMAGE" && (
           <div className="relative group">
             <button onClick={onMediaClick} className="block w-full h-full focus:outline-none">
               <div className="relative" style={{ paddingBottom: aspectRatio }}>
@@ -317,7 +317,7 @@ export function Message({
           </div>
         )}
 
-        {type === "video" && (
+        {type === "VIDEO" && (
           <div className="relative group">
             <button onClick={onMediaClick} className="block w-full h-full focus:outline-none">
               <div className="relative" style={{ paddingBottom: aspectRatio }}>

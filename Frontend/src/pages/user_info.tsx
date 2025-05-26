@@ -11,7 +11,7 @@ import AvatarSelect from '../components/avatarselect';
 
 interface UserData {
   username: string;
-  Bio: string;
+  about: string;
   email: string;
   phoneNumber: string;
   profilePicUrl: string;
@@ -27,7 +27,7 @@ export default function ProfilePage() {
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
+  const [about, setabout] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export default function ProfilePage() {
 useEffect(() => {
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       
       if (!token) {
         navigate('/login');
@@ -52,7 +52,7 @@ useEffect(() => {
 
       const response = await fetch('http://localhost:3000/user/me', {
     headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `${token}`,
     },
 });
 
@@ -71,7 +71,7 @@ useEffect(() => {
       console.log('Received user data:', user); // Debug log
       
       setName(user.username || '');
-      setBio(user.Bio || user.bio || ''); // Handle both Bio and bio cases
+      setabout(user.about || user.about || ''); // Handle both about and about cases
       setEmail(user.email || '');
       
       if (user.phoneNumber) {
@@ -136,8 +136,9 @@ useEffect(() => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('userId')
+    navigate('/');
   };
 
   const handleSaveProfile = async () => {
@@ -149,30 +150,21 @@ useEffect(() => {
   setLoading(true);
 
   try {
-    const token = localStorage.getItem('token');
-    const formData = new FormData();
-    
-    formData.append('username', name);
-    formData.append('bio', bio); // Changed from Bio to bio to match backend
-    formData.append('email', email);
-    
-    if (phone) {
-      formData.append('phoneNumber', selectedCountry.code + phone);
-    }
-    
-    if (selectedFile) {
-      formData.append('profilePic', selectedFile);
-    } else if (profileImage && !profileImage.startsWith('blob:')) {
-      formData.append('profilePicUrl', profileImage);
-    }
-
+    const token = sessionStorage.getItem('token');
     const response = await fetch('http://localhost:3000/user/update', {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData,
-    });
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json', // Required for JSON payload
+    'Authorization': `${token}`
+  },
+  body: JSON.stringify({
+    username: name,
+    about: about,
+    phoneNumber: selectedCountry.code + phone,
+    profilePicUrl: profileImage
+  }),
+});
+
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -185,7 +177,7 @@ useEffect(() => {
     
     // Update local state
     setName(data.user.username);
-    setBio(data.user.Bio || '');
+    setabout(data.user.about || '');
     setEmail(data.user.email);
     if (data.user.profilePicUrl) {
       setProfileImage(data.user.profilePicUrl);
@@ -240,8 +232,8 @@ useEffect(() => {
 
           {/* Profile Info */}
           <div className="space-y-6 mb-8">
-            <InfoField label="Bio" value={bio} isEditing={isEditing} onChange={setBio} />
-            <InfoField label="Email" value={email} isEditing={isEditing} onChange={setEmail} type="email" />
+            <InfoField label="about" value={about} isEditing={isEditing} onChange={setabout} />
+            <InfoField label="Email" value={email} isEditing={false}  type="email" />
             
             {/* Phone Number with Country Code */}
             <div>

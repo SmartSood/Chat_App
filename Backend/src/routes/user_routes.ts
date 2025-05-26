@@ -50,7 +50,9 @@ User_router.get('/all',authmiddleware,async(req:Request,res:Response)=>{
 User_router.put('/update',authmiddleware,async (req:Request,res:Response)=>{
     //@ts-ignore
 const id=req.user.id
-const {username,email,phoneNumber,profilePicUrl}=req.body;
+console.log(req.body);
+const {username,phoneNumber,profilePicUrl,about}=req.body;
+
 
 const user=await prisma.user.update({
     where:{
@@ -58,7 +60,7 @@ const user=await prisma.user.update({
     },
     data:{
         username,
-        email,
+        about,
         phoneNumber,
         profilePicUrl
     }

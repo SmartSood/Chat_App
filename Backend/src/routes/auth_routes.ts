@@ -5,6 +5,7 @@ import prisma from "../PrismaClient/PrismaClientGenerate";
 import { Request,Response,NextFunction } from "express";
 import jwt  from "jsonwebtoken";
 import upload from '../middleware/upload';
+
 // use `prisma` in your application to read and write data in your DB
 const Auth_router=express.Router();
 import bcrypt from "bcrypt";
