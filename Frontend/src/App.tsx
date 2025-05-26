@@ -10,7 +10,7 @@ import Avatar from './components/avatarselect'
 import AvatarSelect from './components/avatarselect'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Signin from './pages/Signin'
-import Addfriend from './pages/Addfriend'
+import Addfriend from './pages/Dashboard'
 import ProtectedRoute from './routes/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 
@@ -47,6 +47,8 @@ function App() {
       <Route path="/signin" element={<Signin/>} />
       <Route element={<ProtectedRoute/>}>
       <Route path="/addfriend" element={<Addfriend />} />
+      
+      
       </Route>
     </Routes>
     </Router>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/Button';
 import { ButtonIcon } from '../ui/Button_Icon';
 import { FiSearch, FiMoreVertical, FiPaperclip, FiMic, FiMessageSquare, FiUsers, FiPhone } from 'react-icons/fi';
@@ -10,6 +10,8 @@ import { AddChatIcon } from '../icons/add_chat_icon';
 import { AvatarIcon } from '../icons/avatar_icon';
 import { GroupIcon } from '../icons/group_icon';
 import { UserAdd } from '../components/userAdd';
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 const ChatxApp = () => {
   // State management
   const [activeTab, setActiveTab] = useState<'messages' | 'social'>('messages');
@@ -22,24 +24,85 @@ const ChatxApp = () => {
   const [addChatOpen,setAddChatOpen]=useState<Boolean>(false) 
   const [selectUserOpen,setSelectUserOpen]=useState<Boolean>(false) ;
   const [selectGroupOpen,setSelectGroupOpen]=useState<Boolean>(false) ;
+  const [userChats,setUserChats]=useState<Object[]>([]);
+  const [fetchChat,setFetchChat]=useState<Number>(0);
+  const [status, setStatus] = useState<Object[]>([]);
+
+  const currentUserId=localStorage.getItem('userId')
+
+  const navigate=useNavigate();
+  //load user chats and triger rerender whenver the window 
+  useEffect(()=>{
+    async function fetch(){
+      try{
+        const response=await axios.get('http://localhost:3000/chat/my-chats',
+        {
+    
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${localStorage.getItem('token')}`
+          }
+        });
+        if(response.status===200){
+          await setUserChats(response.data.chatUsers);
+          console.log('Fetched chats:', response.data.chatUsers);
+//fetching the status from the users
+  const allUserIds = response.data.chatUsers
+            ?.flatMap(chatUser => chatUser.chat.chatUsers.map(cu => cu.userId)) || [];
+            const uniqueUserIds = [...new Set(allUserIds)];
+            // 2. Fetch statuses for each unique user
+        const statusPromises = uniqueUserIds.map(async (userId) =>{
+          return await axios.get(`http://localhost:3000/status/user/${userId}`, {
+    
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${localStorage.getItem('token')}`
+          }
+        }).then(res => res.data).catch((e) => e)}
+        );
+
+        const results = await Promise.all(statusPromises);
+        
+        const validStatuses = results.filter(Boolean).flat();
+        
+        console.log(validStatuses)
+
+        setStatus(prev => [...validStatuses])
+
+        }
+        else{
+          console.log('Error fetching chats');
+        }
+
+
+      }
+        catch(error){
+          console.log(error);
+        }
+    }
+    fetch();
+    
+  
+  },[])
 
 
     //sample chat data
-  const chats = [
-    { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-    { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-    { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-    { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-    { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-    { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-    { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-    { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-    { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-    { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-    { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-    { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
+  // const chats = [
+  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
+  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
+  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
+  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
+  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
+  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
+  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
+  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
+  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
+  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
+  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
+  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
 
-  ];
+  // ];
+
 
 
   // Navigation items
@@ -64,6 +127,7 @@ const ChatxApp = () => {
   const handleNavClick = (navItem: 'chats' | 'status' | 'groups' | 'calls') => {
     setActiveNav(navItem);
     setSelectedChat(null);
+    navigate(`/${navItem}`)
   };
   const handleChatSelect = (chatId: number) => setSelectedChat(chatId);
 
@@ -132,12 +196,7 @@ const ChatxApp = () => {
             </div>
            
           ))}
-</div>
-
-
-
-
-       
+</div>     
         </div>)}  
         
       {/* Left sidebar */}
@@ -189,7 +248,7 @@ const ChatxApp = () => {
         </div>
         
         {/* Chats list */}
-    {chats.length>0?(<div className="flex-1 overflow-y-auto">
+    {userChats.length>0?(<div className="flex-1 overflow-y-auto">
        {/*  fixed add chat button */}
        <div className='fixed sm:bottom-4 bottom-25 right-4 sm:right-230'>
           <ButtonIcon 
@@ -220,29 +279,39 @@ const ChatxApp = () => {
 </div>)}       
 
 
-          {chats.map((chat) => (
-            <div 
-              key={chat.id}
-              className={`flex items-center p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${selectedChat === chat.id ? 'bg-blue-50' : ''}`}
-              onClick={() => handleChatSelect(chat.id)}
-            >
-              <div className="w-10 h-10 rounded-full bg-gray-300 mr-3"></div>
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="font-medium">{chat.name}</span>
-                  <span className="text-xs text-gray-500">{chat.time}</span>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-                  {chat.unread > 0 && (
-                    <span className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {chat.unread}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+{userChats.map(({ chat }) => {
+  const otherUser = chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user;
+
+  return (
+    <div
+      key={chat.id}
+      className={`flex items-center p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${selectedChat === chat.id ? 'bg-blue-50' : ''}`}
+      onClick={() => handleChatSelect(chat.id)}
+    >
+      <img
+        src={otherUser?.profilePicUrl === 'default' ? '/default-avatar.png' : otherUser?.profilePicUrl}
+        alt="profile"
+        className="w-10 h-10 rounded-full bg-gray-300 mr-3 object-cover"
+      />
+      <div className="flex-1">
+        <div className="flex justify-between">
+          <span className="font-medium">{otherUser?.username}</span>
+          <span className="text-xs text-gray-500">
+            {chat.messages[0]?.sentAt ? new Date(chat.messages[0].sentAt).toLocaleTimeString() : ''}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-sm text-gray-600 truncate">
+            {chat.messages[0]?.text || 'No messages yet'}
+          </p>
+          {/* Optional unread badge logic */}
+        </div>
+      </div>
+    </div>
+  );
+})}
+
+
         </div>):(<div className='flex w-full h-full justify-center items-center'>
           <ButtonIcon fill_color='bg-black' size='xtralarge' className='p-3 ' icon={<AddChatIcon size='5xl'></AddChatIcon>}></ButtonIcon>
           
@@ -284,7 +353,13 @@ const ChatxApp = () => {
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-gray-300 mr-3"></div>
               <div>
-                <h2 className="font-medium">{chats.find(c => c.id === selectedChat)?.name}</h2>
+              <h2 className="font-medium">
+  {
+    userChats.find(cu => cu.chat.id === selectedChat)
+      ?.chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user.username
+  }
+</h2>
+
                 <p className="text-xs text-gray-500">Online</p>
               </div>
             </div>
@@ -307,7 +382,7 @@ const ChatxApp = () => {
               <div className="bg-white rounded-lg p-3 max-w-xs shadow">
                 <p>Hi! How are you?</p>
                 <p className="text-xs text-gray-500 text-right mt-1">10:32 AM</p>
-              </div>
+              </div> 
             </div>
           </div>
 
