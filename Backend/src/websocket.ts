@@ -12,6 +12,7 @@ const clients = new Map<string, Set<WebSocket>>();
 
 function authenticateClient(token: string): { userId: string } | null {
   try {
+
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     return decoded;
   } catch {
@@ -22,9 +23,10 @@ function authenticateClient(token: string): { userId: string } | null {
 const wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', (ws, req) => {
+  console.log('New WebSocket connection established');
+  console.log(JWT_SECRET)
   // Extract token from query string
-  const params = new URLSearchParams(req.url?.split('?')[1]);
-  console.log(params)
+  const params = new URLSearchParams(req.url);
   let token = params.get('token');
   if (!token) {
     const authHeader = params.get('authorization') || '';
@@ -32,7 +34,7 @@ wss.on('connection', (ws, req) => {
       token = authHeader.split(' ')[1];
     }
   }
-
+  console.log(token)
   const auth = token ? authenticateClient(token) : null;
   if (!auth) {
     ws.send(JSON.stringify({ type: 'error', message: 'Unauthorized' }));
