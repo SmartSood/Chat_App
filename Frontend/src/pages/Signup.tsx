@@ -104,9 +104,9 @@ export default function Signup() {
         alert('User created successfully');
       console.log(data);
          //@ts-ignore
-      localStorage.setItem('userId',data.user.id)
+      sessionStorage.setItem('userId',data.user.id)
       //@ts-ignore
-        localStorage.setItem('token', data.token);
+        sessionStorage.setItem('token', data.token);
         navigate('/signin')
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));

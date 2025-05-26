@@ -41,7 +41,7 @@ const StatusView = ({ statuses, onClose, authToken, currentUserId }: StatusViewP
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${localStorage.getItem('token')}` // Or your auth method
+          'Authorization': `${sessionStorage.getItem('token')}` // Or your auth method
         }
       }).catch(console.error);
     }

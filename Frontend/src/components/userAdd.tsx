@@ -11,7 +11,7 @@ export function UserAdd({setSelectUserOpen,selectUserOpen}:any){
           const response = await axios.get('http://localhost:3000/user/all', {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `${localStorage.getItem('token')}`,
+              Authorization: `${sessionStorage.getItem('token')}`,
             },
           });
     
@@ -56,7 +56,7 @@ const Submit = async () => {
       },
       {
         headers: {
-          Authorization: `${localStorage.getItem('token')}` // replace with your token logic
+          Authorization: `${sessionStorage.getItem('token')}` // replace with your token logic
         }
       }
     );

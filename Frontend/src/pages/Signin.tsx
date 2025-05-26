@@ -50,10 +50,14 @@ export default function Signin() {
         alert('User Signed in successfully');
         console.log(data);
         //@ts-ignore
-      localStorage.setItem('userId',data.user.id)
+      sessionStorage.setItem('userId',data.user.id)
       //@ts-ignore
-        localStorage.setItem('token', data.token);
-        navigate('/addfriend')
+        sessionStorage.setItem('token', data.token);
+        setTimeout(()=>{
+          console.log("Tzimeour over")
+          navigate('/addfriend')
+        },2000)
+       
       } else {
         alert('Error: ' + (data.message || 'Something went wrong'));
       }

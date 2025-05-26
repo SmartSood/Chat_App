@@ -38,21 +38,21 @@ function App() {
 
   return (
 
-    <AuthProvider>
+    // <AuthProvider>
    < Router>
     <Routes>
       <Route path="/" element={<Landingpage />} />
 
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signin" element={<Signin/>} />
-      <Route element={<ProtectedRoute/>}>
+      {/* <Route element={<ProtectedRoute/>}> */}
       <Route path="/addfriend" element={<Addfriend />} />
       
       
-      </Route>
+      {/* </Route> */}
     </Routes>
     </Router>
-    </AuthProvider>
+    // </AuthProvider>
    
       
     

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState ,useRef} from 'react';
 import { Button } from '../ui/Button';
 import { ButtonIcon } from '../ui/Button_Icon';
 import { FiSearch, FiMoreVertical, FiPaperclip, FiMic, FiMessageSquare, FiUsers, FiPhone } from 'react-icons/fi';
@@ -13,6 +13,27 @@ import { UserAdd } from '../components/userAdd';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import StatusView from '../components/status';
+import { Message } from '../ui/Message_Box';
+function formatTime(isoString) {
+  const date = new Date(isoString);
+  
+  // Get hours and minutes
+  let hours = date.getHours();       // 0-23
+  const minutes = date.getMinutes(); // 0-59
+
+  // Determine AM/PM
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert 24-hour to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  // Pad minutes with leading zero if needed
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+
+  return `${hours}:${minutesStr} ${ampm}`;
+}
+
 const ChatxApp = () => {
   // State management
   const [activeTab, setActiveTab] = useState<'messages' | 'social'>('messages');
@@ -28,10 +49,45 @@ const ChatxApp = () => {
   const [userChats,setUserChats]=useState<Object[]>([]);
   const [fetchChat,setFetchChat]=useState<Number>(0);
   const [status, setStatus] = useState<Object[]>([]);
+  const [messages, setMessages] = useState([]);
+  const currentUserId=sessionStorage.getItem('userId')
+  const [token,setToken]=useState<String|null>(sessionStorage.getItem('token')||null)
+    const navigate=useNavigate();
+  const ws = useRef(null);
+  useEffect(() => {
+    ws.current = new WebSocket(`ws://localhost:8080/?token=${sessionStorage.getItem('token')}`);
 
-  const currentUserId=localStorage.getItem('userId')
+    ws.current.onopen = () => console.log('WS connected');
 
-  const navigate=useNavigate();
+    ws.current.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === 'new_message' && data.message.chatId === selectedChat) {
+        setMessages((prev) => [...prev, data.message]);
+      }
+    };
+
+    ws.current.onclose = () => console.log('WS disconnected');
+
+    return () => {
+   
+    };
+  }, [selectedChat, token]);
+
+  const sendMessage = (content) => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket is not open. Ready state:', ws.current?.readyState);
+      return;
+    }
+  
+    ws.current.send(
+      JSON.stringify({
+        type: 'send_message',
+        selectedChat,
+        content,
+        type: 'TEXT',
+      })
+    );
+  };
   //load user chats and triger rerender whenver the window 
   useEffect(()=>{
     async function fetch(){
@@ -41,7 +97,7 @@ const ChatxApp = () => {
     
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${localStorage.getItem('token')}`
+            Authorization: `${sessionStorage.getItem('token')}`
           }
         });
         if(response.status===200){
@@ -57,7 +113,7 @@ const ChatxApp = () => {
     
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${localStorage.getItem('token')}`
+            Authorization: `${sessionStorage.getItem('token')}`
           }
         }).then(res => res.data).catch((e) => e)}
         );
@@ -66,7 +122,7 @@ const ChatxApp = () => {
         
         const validStatuses = results.filter(Boolean).flat();
         
-        console.log(validStatuses)
+   
 
         setStatus(prev => [...validStatuses])
 
@@ -200,7 +256,7 @@ const ChatxApp = () => {
         </div>)}  
         
       {/* Left sidebar */}
-     {((activeNav==='status')?(<StatusView statuses={status} authToken={localStorage.getItem('token')} currentUserId={localStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
+     {((activeNav==='status')?(<StatusView statuses={status} authToken={sessionStorage.getItem('token')} currentUserId={sessionStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
      <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-blue-background-1 sm:bg-white">
         {/* Header */}
         <header className="flex justify-between items-center p-3  border-gray-300">
@@ -281,6 +337,7 @@ const ChatxApp = () => {
 
 {userChats.map(({ chat }) => {
   const otherUser = chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user;
+
 
   return (
     <div
@@ -373,20 +430,28 @@ const ChatxApp = () => {
           </div>
 
           {/* Messages area */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            <div className="flex justify-end mb-4">
-              <div className="bg-blue-100 rounded-lg p-3 max-w-xs">
-                <p>Hey there!</p>
-                <p className="text-xs text-gray-500 text-right mt-1">10:30 AM</p>
-              </div>
-            </div>
-            <div className="flex justify-start mb-4">
-              <div className="bg-white rounded-lg p-3 max-w-xs shadow">
-                <p>Hi! How are you?</p>
-                <p className="text-xs text-gray-500 text-right mt-1">10:32 AM</p>
-              </div> 
-            </div>
+<div className='overflow-auto'>
+          {userChats.map((Chats)=>{
+            //@ts-ignore
+            console.log(Chats)
+            if(Chats.chatId===selectedChat){
+       
+              return(
+                
+                            //@ts-ignore
+                Chats.chat.messages.map((message)=>{
+                  
+                     return( 
+                      <div className='p-4 '>                     <Message variant={(message.senderId===currentUserId)?"sent":"received"} type='text' text={message.content} time={formatTime(message.sentAt)}></Message></div>
+                     
+)
+
+                })
+              )
+            }
+          })}
           </div>
+
 
           {/* Message input */}
           <div className="flex items-center p-3 border-t border-gray-300 bg-white">
@@ -401,6 +466,11 @@ const ChatxApp = () => {
               placeholder="Type a message"
               className="flex-1 border rounded-full px-4 py-2 focus:outline-none"
             />
+            <ButtonIcon 
+              icon={<FiMessageSquare className="text-gray-600" />}
+              size="small"
+              className="ml-2"
+              onClick={() => sendMessage('Hello!')}/>
             <ButtonIcon 
               icon={<FiMic className="text-gray-600" />}
               size="small"

@@ -24,6 +24,7 @@ message_Router.post('/:chatId', authmiddleware, async (req, res) => {
 
     const { chatId } = req.params;
     const { content, mediaUrl, type } = req.body;
+    console.log(chatId);
 
     if (!chatId || (!content && !mediaUrl)) {
       return res.status(400).json({ message: 'Message content or media is required' });

@@ -24,7 +24,7 @@ const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', (ws, req) => {
   // Extract token from query string
   const params = new URLSearchParams(req.url?.split('?')[1]);
-
+  console.log(params)
   let token = params.get('token');
   if (!token) {
     const authHeader = params.get('authorization') || '';
