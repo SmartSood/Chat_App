@@ -10,7 +10,7 @@ import { AddChatIcon } from '../icons/add_chat_icon';
 import { AvatarIcon } from '../icons/avatar_icon';
 import { GroupIcon } from '../icons/group_icon';
 import { UserAdd } from '../components/userAdd';
-import axios from 'axios'
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import StatusView from '../components/status';
 import { Message } from '../ui/Message_Box';
@@ -43,51 +43,16 @@ const ChatxApp = () => {
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
   const isSmallScreen = useIsSmallScreen();
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [addChatOpen,setAddChatOpen]=useState<Boolean>(false) 
-  const [selectUserOpen,setSelectUserOpen]=useState<Boolean>(false) ;
-  const [selectGroupOpen,setSelectGroupOpen]=useState<Boolean>(false) ;
-  const [userChats,setUserChats]=useState<Object[]>([]);
-  const [fetchChat,setFetchChat]=useState<Number>(0);
+  const [addChatOpen, setAddChatOpen] = useState<boolean>(false);
+  const [selectUserOpen, setSelectUserOpen] = useState<boolean>(false);
+  const [selectGroupOpen, setSelectGroupOpen] = useState<boolean>(false);
+  const [userChats, setUserChats] = useState<Object[]>([]);
+  const [fetchChat, setFetchChat] = useState<number>(0);
   const [status, setStatus] = useState<Object[]>([]);
-  const [messages, setMessages] = useState([]);
-  const currentUserId=sessionStorage.getItem('userId')
-  const [token,setToken]=useState<String|null>(sessionStorage.getItem('token')||null)
-    const navigate=useNavigate();
-  const ws = useRef(null);
-  useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:8080/?token=${sessionStorage.getItem('token')}`);
 
-    ws.current.onopen = () => console.log('WS connected');
+  const currentUserId=localStorage.getItem('userId')
 
-    ws.current.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      if (data.type === 'new_message' && data.message.chatId === selectedChat) {
-        setMessages((prev) => [...prev, data.message]);
-      }
-    };
-
-    ws.current.onclose = () => console.log('WS disconnected');
-
-    return () => {
-   
-    };
-  }, [selectedChat, token]);
-
-  const sendMessage = (content) => {
-    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-      console.error('WebSocket is not open. Ready state:', ws.current?.readyState);
-      return;
-    }
-  
-    ws.current.send(
-      JSON.stringify({
-        type: 'send_message',
-        selectedChat,
-        content,
-        type: 'TEXT',
-      })
-    );
-  };
+  const navigate=useNavigate();
   //load user chats and triger rerender whenver the window 
   useEffect(()=>{
     async function fetch(){
@@ -100,11 +65,13 @@ const ChatxApp = () => {
             Authorization: `${sessionStorage.getItem('token')}`
           }
         });
-        if(response.status===200){
+        
+        if (response.status === 200) {
           await setUserChats(response.data.chatUsers);
           console.log('Fetched chats:', response.data.chatUsers);
-//fetching the status from the users
-  const allUserIds = response.data.chatUsers
+
+          // Fetching the status from the users
+          const allUserIds = response.data.chatUsers
             ?.flatMap(chatUser => chatUser.chat.chatUsers.map(cu => cu.userId)) || [];
             const uniqueUserIds = [...new Set(allUserIds)];
             // 2. Fetch statuses for each unique user
@@ -113,7 +80,7 @@ const ChatxApp = () => {
     
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${sessionStorage.getItem('token')}`
+            Authorization: `${localStorage.getItem('token')}`
           }
         }).then(res => res.data).catch((e) => e)}
         );
@@ -122,7 +89,7 @@ const ChatxApp = () => {
         
         const validStatuses = results.filter(Boolean).flat();
         
-   
+        console.log(validStatuses)
 
         setStatus(prev => [...validStatuses])
 
@@ -130,37 +97,12 @@ const ChatxApp = () => {
         else{
           console.log('Error fetching chats');
         }
-
-
+      } catch (error) {
+        console.log(error);
       }
-        catch(error){
-          console.log(error);
-        }
     }
     fetch();
-    
-  
-  },[])
-
-
-    //sample chat data
-  // const chats = [
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-  //   { id: 1, name: 'John Doe', lastMessage: 'Hey, how are you?', time: '10:30 AM', unread: 2 },
-  //   { id: 2, name: 'Jane Smith', lastMessage: 'Meeting at 3pm', time: 'Yesterday', unread: 0 },
-  //   { id: 3, name: 'Work Group', lastMessage: 'Alice: I sent the files', time: 'Yesterday', unread: 5 },
-
-  // ];
-
-
+  }, []);
 
   // Navigation items
   const navItems = [
@@ -168,16 +110,12 @@ const ChatxApp = () => {
     { id: 'status', icon: <FiUsers size={20} />, label: 'Status' },
     { id: 'groups', icon: <FiUsers size={20} />, label: 'Groups' },
     { id: 'calls', icon: <FiPhone size={20} />, label: 'Calls' },
-    
-
-    
   ];
-  const bottomNavItems=[
+
+  const bottomNavItems = [
     { id: 'settings', icon: <SettingsIcon size={20} />, label: 'Settings' },
     { id: 'logout', icon: <LogoutIcon size={20} />, label: 'Logout' }
-  ]
-  
-
+  ];
 
   // Handler functions
   const handleSearchClick = () => setShowSearch(!showSearch);
@@ -189,74 +127,66 @@ const ChatxApp = () => {
 
   return (
     <div className="flex h-screen bg-gray-button-1">
-       {/*  left Navigation big screen */}
-       {!isSmallScreen&&(<div className="  justify-around p-2 border border-gray-300 bg-blue-background-1">
-
-
-           
-
-        {/* Logo and Profile Image */}
-        <div className='border-b-1 border-gray-300'>
-        <div className="flex items-center justify-center mb-4">
-          <LogoIcon size="2xl" />
-        </div>
-        <div className="relative w-14 h-14 mx-auto mb-8">
-          {profileImage ? (
-            <img
-              src={profileImage}
-              alt="Profile"
-              className="w-14 h-14 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-14 h-14 bg-gray-300 rounded-full" />
-          )}
-          </div>
-          </div>
-
-
-          
-          {navItems.map((item) => (
-            <div className='mb-4'>
-               <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id as any)}
-              className={`flex flex-col justify-center items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
-            >
-              <div className={`p-2 flex justify-center items-center rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
-                {React.cloneElement(item.icon, {
-                  className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
-                })}
-              </div>
-              <span className="text-xs mt-1">{item.label}</span>
-            </button>
+      {/* Left Navigation big screen */}
+      {!isSmallScreen && (
+        <div className="justify-around p-2 border border-gray-300 bg-blue-background-1">
+          {/* Logo and Profile Image */}
+          <div className='border-b-1 border-gray-300'>
+            <div className="flex items-center justify-center mb-4">
+              <LogoIcon size="2xl" />
             </div>
-           
+            <div className="relative w-14 h-14 mx-auto mb-8">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="w-14 h-14 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-14 h-14 bg-gray-300 rounded-full" />
+              )}
+            </div>
+          </div>
+
+          {navItems.map((item) => (
+            <div className='mb-4' key={item.id}>
+              <button
+                onClick={() => handleNavClick(item.id as any)}
+                className={`flex flex-col justify-center items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
+              >
+                <div className={`p-2 flex justify-center items-center rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
+                  {React.cloneElement(item.icon, {
+                    className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
+                  })}
+                </div>
+                <span className="text-xs mt-1">{item.label}</span>
+              </button>
+            </div>
           ))}
 
           {/* Bottom Navigation Items */}
-<div className=' fixed bottom-0 items-center justify-center'>
-{bottomNavItems.map((item) => (
-            <div className='mb-4'>
-               <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id as any)}
-              className={`flex flex-col justify-center items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
-            >
-              <div className={`p-2 flex justify-center items-center rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
-                {React.cloneElement(item.icon, {
-                  className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
-                })}
+          <div className='fixed bottom-0 items-center justify-center'>
+            {bottomNavItems.map((item) => (
+              <div className='mb-4' key={item.id}>
+                <button
+                  onClick={() => handleNavClick(item.id as any)}
+                  className={`flex flex-col justify-center items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
+                >
+                  <div className={`p-2 flex justify-center items-center rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
+                    {React.cloneElement(item.icon, {
+                      className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
+                    })}
+                  </div>
+                  <span className="flex justify-center items-center text-xs mt-1">{item.label}</span>
+                </button>
               </div>
-              <span className="  flex justify-center items-center text-xs mt-1">{item.label}</span>
-            </button>
-            </div>
-           
-          ))}
-</div>     
-        </div>)}  
-        
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Left sidebar */}
-     {((activeNav==='status')?(<StatusView statuses={status} authToken={sessionStorage.getItem('token')} currentUserId={sessionStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
+     {((activeNav==='status')?(<StatusView statuses={status} authToken={localStorage.getItem('token')} currentUserId={localStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
      <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-blue-background-1 sm:bg-white">
         {/* Header */}
         <header className="flex justify-between items-center p-3  border-gray-300">
@@ -281,144 +211,147 @@ const ChatxApp = () => {
           </div>
         </header>
 
-        {/* Tab Section */}
-        <div className='bg-blue-background-1 h-14 flex justify-center sm:bg-white'>
-        <div className="flex rounded-full  w-[90%]   overflow-hidden bg-gray-button-1 ">
-          <Button
-            variant={activeTab === 'messages' ? 'primary' : 'secondary'}
-            text="Messages"
-            className="flex-1  text-sm"
-            position='single'
-            onClick={() => setActiveTab('messages')
-            }
-          />
-          <Button
-            variant={activeTab === 'social' ? 'primary' : 'secondary'}
-            text="Social"
-            className="flex-1 text-sm"
-            position='single'
-            onClick={() => setActiveTab('social')}
-          />
-        </div>
+          {/* Tab Section */}
+          <div className='bg-blue-background-1 h-14 flex justify-center sm:bg-white'>
+            <div className="flex rounded-full w-[90%] overflow-hidden bg-gray-button-1">
+              <Button
+                variant={activeTab === 'messages' ? 'primary' : 'secondary'}
+                text="Messages"
+                className="flex-1 text-sm"
+                position='single'
+                onClick={() => setActiveTab('messages')}
+              />
+              <Button
+                variant={activeTab === 'social' ? 'primary' : 'secondary'}
+                text="Social"
+                className="flex-1 text-sm"
+                position='single'
+                onClick={() => setActiveTab('social')}
+              />
+            </div>
+          </div>
 
-        </div>
-         {/*  add chat open */}
-         {addChatOpen&&(<div className="w-80 p-4 bg-gray-button-2 fixed sm:left-50 left-40 bottom-40 sm:bottom-20 rounded-xl shadow-[0px_0px_100px_0px_rgba(0,0,0,0.20)] inline-flex flex-col  items-center gap-4">
-  <div onClick={()=>{setSelectUserOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
-    <div className="w-6 h-6 relative overflow-hidden">
-      <div className="w-4 h-5 " > <AvatarIcon size="lg"></AvatarIcon></div>
-    </div>
-    <div className="text-center justify-start text-white text-lg font-medium ">Add Friend</div>
-  </div>
-  <div onClick={()=>{setSelectGroupOpen(true)}} className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4">
-    <div className="w-6 h-6 relative overflow-hidden">
-    <div className="w-4 h-5 " > <GroupIcon size="lg"></GroupIcon></div>
-    </div>
-    <div className="text-center justify-start text-white text-lg font-medium ">Create Group</div>
-  </div>
-</div>)}     
-        {/* Chats list */}
-    {userChats.length>0?(<div className="flex-1 overflow-y-auto">
-       {/*  fixed add chat button */}
-       <div className='fixed sm:bottom-4 bottom-25 right-4 sm:right-230'>
-          <ButtonIcon 
-            icon={<AddChatIcon size="xl" />}
-            size="large"
-            fill_color="bg-black"
-            className="p-3"
-            onClick={() => {
-              setAddChatOpen((op)=>!op);
-            }}
-          />
-        </div>
+          {/* Add chat open */}
+          {addChatOpen && (
+            <div className="w-80 p-4 bg-gray-button-2 fixed sm:left-50 left-40 bottom-40 sm:bottom-20 rounded-xl shadow-[0px_0px_100px_0px_rgba(0,0,0,0.20)] inline-flex flex-col items-center gap-4">
+              <div 
+                onClick={() => { setSelectUserOpen(true) }} 
+                className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4"
+              >
+                <div className="w-6 h-6 relative overflow-hidden">
+                  <div className="w-4 h-5"><AvatarIcon size="lg" /></div>
+                </div>
+                <div className="text-center justify-start text-white text-lg font-medium">Add Friend</div>
+              </div>
+              <div 
+                onClick={() => { setSelectGroupOpen(true) }} 
+                className="self-stretch p-4 rounded-md inline-flex justify-start items-center gap-4"
+              >
+                <div className="w-6 h-6 relative overflow-hidden">
+                  <div className="w-4 h-5"><GroupIcon size="lg" /></div>
+                </div>
+                <div className="text-center justify-start text-white text-lg font-medium">Create Group</div>
+              </div>
+            </div>
+          )}
 
-              
-
+          {/* Chats list */}
+          {userChats.length > 0 ? (
+            <div className="flex-1 overflow-y-auto">
+              {/* Fixed add chat button */}
+              <div className='fixed sm:bottom-4 bottom-25 right-4 sm:right-230'>
+                <ButtonIcon 
+                  icon={<AddChatIcon size="xl" />}
+                  size="large"
+                  fill_color="bg-black"
+                  className="p-3"
+                  onClick={() => { setAddChatOpen((op) => !op) }}
+                />
+              </div>
 
 {userChats.map(({ chat }) => {
   const otherUser = chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user;
 
-
-  return (
-    <div
-      key={chat.id}
-      className={`flex items-center p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${selectedChat === chat.id ? 'bg-blue-50' : ''}`}
-      onClick={() => handleChatSelect(chat.id)}
-    >
-      <img
-        src={otherUser?.profilePicUrl === 'default' ? '/default-avatar.png' : otherUser?.profilePicUrl}
-        alt="profile"
-        className="w-10 h-10 rounded-full bg-gray-300 mr-3 object-cover"
-      />
-      <div className="flex-1">
-        <div className="flex justify-between">
-          <span className="font-medium">{otherUser?.username}</span>
-          <span className="text-xs text-gray-500">
-            {chat.messages[0]?.sentAt ? new Date(chat.messages[0].sentAt).toLocaleTimeString() : ''}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <p className="text-sm text-gray-600 truncate">
-            {chat.messages[0]?.text || 'No messages yet'}
-          </p>
-          {/* Optional unread badge logic */}
-        </div>
-      </div>
-    </div>
-  );
-})}
-
-
-        </div>):(<div onClick={()=>{
-             setAddChatOpen((op)=>!op);
-          }} className='flex w-full h-full justify-center items-center'>
-          <ButtonIcon  fill_color='bg-black' size='xtralarge' className='p-3 ' icon={<AddChatIcon size='5xl'></AddChatIcon>}></ButtonIcon>
-          
-        </div>)}    
-
-        {/* Fixed Bottom Navigation */}
-      {isSmallScreen&&(<nav className="  flex justify-around p-2 border-t border-gray-300 bg-white">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id as any)}
-              className={`flex flex-col items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
+                return (
+                  <div
+                    key={chat.id}
+                    className={`flex items-center p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${selectedChat === chat.id ? 'bg-blue-50' : ''}`}
+                    onClick={() => handleChatSelect(chat.id)}
+                  >
+                    <img
+                      src={otherUser?.profilePicUrl === 'default' ? '/default-avatar.png' : otherUser?.profilePicUrl}
+                      alt="profile"
+                      className="w-10 h-10 rounded-full bg-gray-300 mr-3 object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <span className="font-medium">{otherUser?.username}</span>
+                        <span className="text-xs text-gray-500">
+                          {chat.messages[0]?.sentAt ? new Date(chat.messages[0].sentAt).toLocaleTimeString() : ''}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-sm text-gray-600 truncate">
+                          {chat.messages[0]?.text || 'No messages yet'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div 
+              onClick={() => { setAddChatOpen((op) => !op) }} 
+              className='flex w-full h-full justify-center items-center'
             >
-              <div className={`p-2 rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
-                {React.cloneElement(item.icon, {
-                  className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
-                })}
-              </div>
-              <span className="text-xs mt-1">{item.label}</span>
-            </button>
-          ))}
-        </nav>)}  
+              <ButtonIcon 
+                fill_color='bg-black' 
+                size='xtralarge' 
+                className='p-3' 
+                icon={<AddChatIcon size='5xl' />}
+              />
+            </div>
+          )}
 
-       
-      </div>):(selectUserOpen)?(<UserAdd setSelectUserOpen={setSelectUserOpen}></UserAdd>):(<div></div>))} 
-     
-     
-     
-
-       
-       
+          {/* Fixed Bottom Navigation */}
+          {isSmallScreen && (
+            <nav className="flex justify-around p-2 border-t border-gray-300 bg-white">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id as any)}
+                  className={`flex flex-col items-center p-1 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-600'}`}
+                >
+                  <div className={`p-2 rounded-full ${activeNav === item.id ? 'bg-blue-100' : ''}`}>
+                    {React.cloneElement(item.icon, {
+                      className: `w-5 h-5 ${activeNav === item.id ? 'text-blue-600' : 'text-gray-500'}`
+                    })}
+                  </div>
+                  <span className="text-xs mt-1">{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          )}
+        </div>
+      ) : selectUserOpen ? (
+        <UserAdd setSelectUserOpen={setSelectUserOpen} />
+      ) : (
+        <div></div>
+      )}
 
       {/* Right side - Chat area */}
-
-    {!isSmallScreen&&((selectedChat ? (
+      {!isSmallScreen && (selectedChat ? (
         <div className="flex bg-blue-background-1 flex-col flex-1">
           {/* Chat header */}
           <div className="flex items-center justify-between p-3 border-b border-gray-300 bg-white">
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-gray-300 mr-3"></div>
               <div>
-              <h2 className="font-medium">
-  {
-    userChats.find(cu => cu.chat.id === selectedChat)
-      ?.chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user.username
-  }
-</h2>
-
+                <h2 className="font-medium">
+                  {userChats.find(cu => cu.chat.id === selectedChat)
+                    ?.chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user.username}
+                </h2>
                 <p className="text-xs text-gray-500">Online</p>
               </div>
             </div>
@@ -430,26 +363,19 @@ const ChatxApp = () => {
           </div>
 
           {/* Messages area */}
-<div className='overflow-auto'>
-          {userChats.map((Chats)=>{
-            //@ts-ignore
-            console.log(Chats)
-            if(Chats.chatId===selectedChat){
-       
-              return(
-                
-                            //@ts-ignore
-                Chats.chat.messages.map((message)=>{
-                  
-                     return( 
-                      <div className='p-4 '>                     <Message variant={(message.senderId===currentUserId)?"sent":"received"} type='text' text={message.content} time={formatTime(message.sentAt)}></Message></div>
-                     
-)
-
-                })
-              )
-            }
-          })}
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="flex justify-end mb-4">
+              <div className="bg-blue-100 rounded-lg p-3 max-w-xs">
+                <p>Hey there!</p>
+                <p className="text-xs text-gray-500 text-right mt-1">10:30 AM</p>
+              </div>
+            </div>
+            <div className="flex justify-start mb-4">
+              <div className="bg-white rounded-lg p-3 max-w-xs shadow">
+                <p>Hi! How are you?</p>
+                <p className="text-xs text-gray-500 text-right mt-1">10:32 AM</p>
+              </div> 
+            </div>
           </div>
 
 
@@ -488,8 +414,7 @@ const ChatxApp = () => {
             <p className="mt-4 text-gray-600">Select a chat to start messaging</p>
           </div>
         </div>
-      )))}
-      
+      ))}
     </div>
   );
 };
