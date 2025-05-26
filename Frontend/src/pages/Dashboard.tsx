@@ -1,4 +1,5 @@
-import React, { useEffect, useState ,useRef} from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/Button';
 import { ButtonIcon } from '../ui/Button_Icon';
 import { FiSearch, FiMoreVertical, FiPaperclip, FiMic, FiMessageSquare, FiUsers, FiPhone } from 'react-icons/fi';
@@ -13,26 +14,6 @@ import { UserAdd } from '../components/userAdd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import StatusView from '../components/status';
-import { Message } from '../ui/Message_Box';
-function formatTime(isoString) {
-  const date = new Date(isoString);
-  
-  // Get hours and minutes
-  let hours = date.getHours();       // 0-23
-  const minutes = date.getMinutes(); // 0-59
-
-  // Determine AM/PM
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-
-  // Convert 24-hour to 12-hour format
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-
-  // Pad minutes with leading zero if needed
-  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-
-  return `${hours}:${minutesStr} ${ampm}`;
-}
 
 const ChatxApp = () => {
   // State management
@@ -50,19 +31,21 @@ const ChatxApp = () => {
   const [fetchChat, setFetchChat] = useState<number>(0);
   const [status, setStatus] = useState<Object[]>([]);
 
-  const currentUserId=localStorage.getItem('userId')
 
-  const navigate=useNavigate();
-  //load user chats and triger rerender whenver the window 
-  useEffect(()=>{
-    async function fetch(){
-      try{
-        const response=await axios.get('http://localhost:3000/chat/my-chats',
-        {
-    
+  const [selectedStatusUserId, setSelectedStatusUserId] = useState<string | null>(null);
+
+
+  const currentUserId = localStorage.getItem('userId');
+  const navigate = useNavigate();
+
+  // Load user chats and trigger rerender whenever the window 
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const response = await axios.get('http://localhost:3000/chat/my-chats', {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${sessionStorage.getItem('token')}`
+            Authorization: `${localStorage.getItem('token')}`
           }
         });
         
@@ -73,28 +56,23 @@ const ChatxApp = () => {
           // Fetching the status from the users
           const allUserIds = response.data.chatUsers
             ?.flatMap(chatUser => chatUser.chat.chatUsers.map(cu => cu.userId)) || [];
-            const uniqueUserIds = [...new Set(allUserIds)];
-            // 2. Fetch statuses for each unique user
-        const statusPromises = uniqueUserIds.map(async (userId) =>{
-          return await axios.get(`http://localhost:3000/status/user/${userId}`, {
-    
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${localStorage.getItem('token')}`
-          }
-        }).then(res => res.data).catch((e) => e)}
-        );
+          const uniqueUserIds = [...new Set(allUserIds)];
+          
+          // Fetch statuses for each unique user
+          const statusPromises = uniqueUserIds.map(async (userId) => {
+            return await axios.get(`http://localhost:3000/status/user/${userId}`, {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${localStorage.getItem('token')}`
+              }
+            }).then(res => res.data).catch((e) => e);
+          });
 
-        const results = await Promise.all(statusPromises);
-        
-        const validStatuses = results.filter(Boolean).flat();
-        
-        console.log(validStatuses)
-
-        setStatus(prev => [...validStatuses])
-
-        }
-        else{
+          const results = await Promise.all(statusPromises);
+          const validStatuses = results.filter(Boolean).flat();
+          console.log(validStatuses);
+          setStatus(validStatuses);
+        } else {
           console.log('Error fetching chats');
         }
       } catch (error) {
@@ -186,30 +164,67 @@ const ChatxApp = () => {
       )}
 
       {/* Left sidebar */}
-     {((activeNav==='status')?(<StatusView statuses={status} authToken={localStorage.getItem('token')} currentUserId={localStorage.getItem('userId')} ></StatusView>):(!selectUserOpen&&!selectGroupOpen)?(
-     <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-blue-background-1 sm:bg-white">
-        {/* Header */}
-        <header className="flex justify-between items-center p-3  border-gray-300">
-          <h1 className="text-xl font-bold">Messages</h1>
-          <div className="flex items-center gap-2">
-            {showSearch && (
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="border rounded-md px-2 sm:w-70 py-1 text-sm"
-                autoFocus
-              />
-            )}
-            <ButtonIcon 
-              icon={<FiSearch className="text-gray-600" />}
-              size="small"
-              fill_color="bg-transparent"
-              onClick={handleSearchClick}
-            />
+      {activeNav === 'status' ? (
+  selectedStatusUserId ? (
+    <StatusView
+      statuses={status.filter(s => s.user.id === selectedStatusUserId)}
+      authToken={localStorage.getItem('token') || ''}
+      currentUserId={currentUserId || ''}
+      onClose={() => setSelectedStatusUserId(null)} // Return to list
+    />
+  ) : (
+    <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-white overflow-y-auto">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h2 className="text-xl font-bold">Status</h2>
+        <button onClick={() => setActiveNav('chats')} className="text-sm text-blue-500">Back</button>
+      </div>
+
+      {Array.from(
+        new Map(status.map(s => [s.user.id, s.user])).values()
+      ).map(user => (
+        <div
+          key={user.id}
+          className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100"
+          onClick={() => setSelectedStatusUserId(user.id)}
+        >
+          <img
+            src={user.profilePicUrl === 'default' ? '/default-avatar.png' : user.profilePicUrl}
+            alt={user.username}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <p className="font-medium">{user.username}</p>
+            <p className="text-xs text-gray-500">Tap to view status</p>
           </div>
-        </header>
+        </div>
+      ))}
+    </div>
+  )
+) : (
+!selectUserOpen && !selectGroupOpen) ? (
+        <div className="flex flex-col w-full sm:w-1/3 border-r border-gray-300 bg-blue-background-1 sm:bg-white">
+          {/* Header */}
+          <header className="flex justify-between items-center p-3 border-gray-300">
+            <h1 className="text-xl font-bold">Messages</h1>
+            <div className="flex items-center gap-2">
+              {showSearch && (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="border rounded-md px-2 sm:w-70 py-1 text-sm"
+                  autoFocus
+                />
+              )}
+              <ButtonIcon 
+                icon={<FiSearch className="text-gray-600" />}
+                size="small"
+                fill_color="bg-transparent"
+                onClick={handleSearchClick}
+              />
+            </div>
+          </header>
 
           {/* Tab Section */}
           <div className='bg-blue-background-1 h-14 flex justify-center sm:bg-white'>
@@ -269,8 +284,8 @@ const ChatxApp = () => {
                 />
               </div>
 
-{userChats.map(({ chat }) => {
-  const otherUser = chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user;
+              {userChats.map(({ chat }) => {
+                const otherUser = chat.chatUsers.find(cu => cu.user.id !== currentUserId)?.user;
 
                 return (
                   <div
@@ -374,10 +389,9 @@ const ChatxApp = () => {
               <div className="bg-white rounded-lg p-3 max-w-xs shadow">
                 <p>Hi! How are you?</p>
                 <p className="text-xs text-gray-500 text-right mt-1">10:32 AM</p>
-              </div> 
+              </div>
             </div>
           </div>
-
 
           {/* Message input */}
           <div className="flex items-center p-3 border-t border-gray-300 bg-white">
@@ -392,11 +406,6 @@ const ChatxApp = () => {
               placeholder="Type a message"
               className="flex-1 border rounded-full px-4 py-2 focus:outline-none"
             />
-            <ButtonIcon 
-              icon={<FiMessageSquare className="text-gray-600" />}
-              size="small"
-              className="ml-2"
-              onClick={() => sendMessage('Hello!')}/>
             <ButtonIcon 
               icon={<FiMic className="text-gray-600" />}
               size="small"
